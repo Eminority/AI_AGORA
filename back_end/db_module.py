@@ -1,6 +1,7 @@
 import os
 from dotenv import load_dotenv
 from pymongo import MongoClient
+from bson.objectid import ObjectId
 
 class MongoDBConnection:
     def __init__(self, uri: str, db_name: str):
@@ -28,6 +29,12 @@ class MongoDBConnection:
         collection = self.db[collection_name]
         result = collection.insert_one(data)
         return str(result.inserted_id)
+
+    def select_data_from_id(self, collection_name: str, id:str):
+        return self.db[collection_name].find_one({"_id":ObjectId(id)})
+
+    def update_data(self, collection_name: str, data:dict):
+        return self.db[collection_name].update_one(data)
 
     def close_connection(self):
         """
