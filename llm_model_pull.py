@@ -67,6 +67,7 @@ class OllamaRunner:
                         continue  # JSON 파싱 오류 발생 시 무시
 
             return generated_text.strip()
+        
 
 # # 실행 예제
 # if __name__ == "__main__":
