@@ -1,3 +1,9 @@
 google-generativeai
 python-dotenv
 pymongo
+langchain
+faiss-cpu
+sentence-transformers
+rank-bm25
+langchain-community
+langchain-huggingface
