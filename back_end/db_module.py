@@ -1,7 +1,9 @@
 import os
 from dotenv import load_dotenv
 from pymongo import MongoClient
+import google.generativeai as genai
 
+# MongoDB 연결 및 데이터 저장 클래스
 class MongoDBConnection:
     def __init__(self, uri: str, db_name: str):
         """
@@ -12,45 +14,48 @@ class MongoDBConnection:
         try:
             self.client = MongoClient(uri)
             self.db = self.client[db_name]
-
+            # 연결 테스트
             self.client.admin.command('ping')
-            print("DB Connection Successed")
+            print("✅ DB Connection Succeeded")
         except Exception as e:
-            print("Connection failed: ", e)
+            print("❌ Connection failed:", e)
 
-    def insert_conversation(self, collection_name: str, data: dict) -> str:
-        """
-        대화 내용을 MongoDB에 저장.
-        :param collection_name: 컬렉션 이름
-        :param data: 저장할 데이터(dict)
-        :return: 생성된 문서의 ObjectID를 문자열로 반환
-        """
-        collection = self.db[collection_name]
-        result = collection.insert_one(data)
-        return str(result.inserted_id)
 
     def close_connection(self):
         """
         MongoDB 연결 종료
         """
         self.client.close()
+        print("🔌 MongoDB 연결 해제됨")
 
+
+
+"""
 if __name__ == "__main__":
-    load_dotenv()  # .env 파일 로드
-    # 예시로 .env에서 URI와 DB_NAME을 불러온다고 가정
+    # 환경 변수 로드
+    load_dotenv()
     MONGO_URI = os.getenv("MONGO_URI")
     DB_NAME = os.getenv("DB_NAME")
+    GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+    
+    if not MONGO_URI or not DB_NAME or not GEMINI_API_KEY:
+        raise ValueError("MONGO_URI, DB_NAME 또는 GEMINI_API_KEY가 .env 파일에 설정되지 않았습니다.")
 
-    if not MONGO_URI or not DB_NAME:
-        raise ValueError("MONGO_URI or DB_NAME is not set in the .env file")
-
+    # MongoDB 연결 객체 생성
     db_connection = MongoDBConnection(MONGO_URI, DB_NAME)
 
-    # 예시 데이터 삽입
-    """
-    example_data = {"message": "Hello, MongoDB!"}
-    inserted_id = db_connection.insert_conversation("test_collection", example_data)
-    print("Inserted document ID:", inserted_id)
-
-    """
+    # 사용자로부터 프롬프트 입력 (예: 역할을 포함한 프롬프트)
+    prompt_input = input("역할을 포함한 프롬프트를 입력하세요: ")
+    
+    # Gemini API를 호출하여 응답 생성
+    gemini_response = get_gemini_response(prompt_input, GEMINI_API_KEY)
+    print("Gemini Response:", gemini_response)
+    
+    # 결과를 MongoDB의 "conversations" 컬렉션에 저장 (프롬프트, 응답, 타임스탬프 포함)
+    COLLECTION_NAME = "conversations"
+    db_connection.save_response_to_db(COLLECTION_NAME, prompt_input, gemini_response)
+    
+    # MongoDB 연결 종료
     db_connection.close_connection()
+    
+"""
