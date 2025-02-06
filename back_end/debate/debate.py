@@ -1,14 +1,11 @@
 from datetime import datetime
 import db_module
 class Debate:
-    def __init__(self, judge):
+    def __init__(self, judge, topic:str = None, participants: dict = None, id: str = None):
         self.judge = judge
         self.debate = {
-            "_id" : None,
-            "participants" : {
-                "pro": None,
-                "con": None
-            },
+            "_id" : id,
+            "participants" : participants,
             "topic" : None,
             "status" : {
                 "type": None,
@@ -25,15 +22,13 @@ class Debate:
             },
             "result": None
         }
-
-    def __init__(self, judge, topic:str, participants:dict):
-        __init__(judge)
-        create(topic, participants)
-
-    def __init__(self, judge, id:str):
-        __init__(judge)
-        self.debate["_id"] = id
-        load()
+        if id:
+            self.load()
+        elif topic and participants:
+            self.create(topic, participants)
+        
+        if not participants:
+            self.debate["participants"] = {"pro":None, "con":None}
         
 
 
@@ -41,8 +36,13 @@ class Debate:
     # 기존 진행중인 토론 load - 자신이 가진 키를 기준으로 load.
     def load(self, db_connection: MongoDBConnection):
         # db에서 기록된 토론 정보 불러와서 덮어쓰기.
-        pass
+        try:
+            self.debate = db_connection.select_data_from_id("debate", self.debate["_id"])
+        except Exception as e :
+            print("load failed : ", e)
+            return False
         
+        return True
 
     # 토론 생성
     #     토론 주제와 참여자를 받아와서 db에 등록
@@ -56,7 +56,8 @@ class Debate:
                 "step": 0
             }
             # db에 추가 이후 키를 받아와서 토론 키를 현재 debate에 등록
-            self.debate["_id"] = "<여기에 insert해서 키 받아오는 코드 입력>"
+            debate_id = db_connection.insert_conversation("debate", self.debate)
+            self.debate["_id"] = debate_id
             return True
         else : 
             #이미 생성된 토론이므로 return False
@@ -64,19 +65,22 @@ class Debate:
 
 # 토론 진행
 # 진행중일때:
-#     발언 순서 관리
-#     debate_turn_manager(debate_id)
-#         현재 진행도? 확인(서론, 본론, 결론)
-#         if 유저의 차례:
-#             발언 입력 받기.
-        
-        
-#         else if AI의 차례:
-#             ai 발언 생성.
-#             generate_ai_response(debate_id, object_id)
+#   발언 순서 관리
+#   debate_turn_manager()
+#       현재 진행도? 확인(서론, 본론, 결론)
+#       if 유저의 차례:
+#           발언 입력 받기.      
+#           else if AI의 차례:
+#               ai 발언 생성.
+#               prompt = "<입력할 프롬프트>"
+#               ai.generete_text(prompt)
 
 #         발언 기록
 #         log_speech(debate_id, speeker, message)
+
+    #토론이 종료되면
+    #   end()
+    #   save(db_connect)
 
 
     # 토론 종료
@@ -85,13 +89,12 @@ class Debate:
             "type" : "end",
             "step" : 0
         }
-        evaluate_debate()
+        evaluate()
         summarize()
-        save()
 
 
     # 토론 판결
-    def evaluate_debate(self):
+    def evaluate(self):
         # self.judge 호출
         # 판결
         self.debate["result"] = None # 여기에 판결 코드 입력하기 True or False?
@@ -110,4 +113,4 @@ class Debate:
 
     #진행된 토론 db에 올리기
     def save(self, db_connection: MongoDBConnection):
-        pass
+        db_connection.update_data("debate", self.debate)
