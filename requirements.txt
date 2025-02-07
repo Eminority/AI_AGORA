@@ -1,0 +1,12 @@
+requests
+beautifulsoup4
+regex
+git+https://github.com/MarioVilas/googlesearch.git
+spacy
+wikipedia
+opencv-python
+subprocess
+json
+ollama
+selenium
+webdriver-manager
