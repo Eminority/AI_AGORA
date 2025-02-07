@@ -4,7 +4,9 @@ from participants import Participant, ParticipantFactory
 from agora_ai import Agora_AI
 from datetime import datetime
 class Debate:
-    def __init__(self, topic:str = None, participants: dict = None, id: str = None, participant_factory:ParticipantFactory = None, db_connection:MongoDBConnection = None):
+    def __init__(self,
+                participant_factory:ParticipantFactory = None,
+                db_connection:MongoDBConnection = None):
         self.pos = None
         self.neg = None
         self.db_connection = db_connection
@@ -28,19 +30,7 @@ class Debate:
             },
             "result": None
         }
-        # 아이디가 있으면 - 아이디 기반으로 토론 정보 로드
-        if id:
-            self.load()
-        elif topic and participants: #주제, 참가자만 있으면 그걸로 생성
-            self.create(topic, participants)
-
-        #참가자가 존재하는 경우 참가자를 객체화해서 가지고 있기
-        if participants:
-            self.pos = participant_factory.make_participant(participants["pos"])
-            self.neg = participant_factory.make_participant(participants["neg"])
-        else :
-            self.debate["participants"] = {"pos":None, "neg":None}
-
+        
         #판사 정의
         gemini_instance = participant_factory.ai_factory.create_ai_instance("GEMINI")
         self.judge = Agora_AI(gemini_instance, vectorhandler=self.vector_handler)
@@ -70,7 +60,7 @@ class Debate:
 #         발언 기록
 #         log_speech(debate_id, speeker, message)
 
-    def progress(self, db_connection: MongoDBConnection):
+    def progress(self):
         # self.debate를 절차에 맞게 수정
         # 이후 return self.debate
         debate = self.debate
@@ -81,7 +71,7 @@ class Debate:
             # 주제를 입력받기
             # 토론 참여자 선택하기
             # 입력받은 주제를 가지고 토론 생성하기
-            self.create(topic="입력받은 주제", participants={"여기에 찬성 측, 반대 측 입력"}, db_connection=db_connection)
+            self.create(topic="입력받은 주제", participants={"여기에 찬성 측, 반대 측 입력"})
         else:
             # 등록된 아이디가 있는 경우
             # 현재 상태 확인
@@ -153,10 +143,10 @@ class Debate:
         
 
     # 기존 진행중인 토론 load - 자신이 가진 키를 기준으로 load.
-    def load(self, db_connection: MongoDBConnection):
+    def load(self):
         # db에서 기록된 토론 정보 불러와서 덮어쓰기.
         try:
-            self.debate = db_connection.select_data_from_id("debate", self.debate["_id"])
+            self.debate = self.db_connection.select_data_from_id("debate", self.debate["_id"])
         except Exception as e :
             print("load failed : ", e)
             return False
@@ -207,5 +197,5 @@ class Debate:
         summary["summarize_verdict"] = ""
 
     #진행된 토론 db에 올리기
-    def save(self, db_connection: MongoDBConnection):
-        db_connection.update_data("debate", self.debate)
+    def save(self):
+        self.db_connection.update_data("debate", self.debate)
