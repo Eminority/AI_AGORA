@@ -42,7 +42,7 @@ class Debate:
 
 
     #id 받아와서 객체로 만들기
-    def make_participant(data):
+    def make_participant(self,data):
         return Participant(data["_id"], data["name"], data["ai"], data["img"])
     
 # 토론 진행
