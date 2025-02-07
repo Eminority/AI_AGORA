@@ -3,12 +3,20 @@ import requests
 import subprocess
 
 class OllamaRunner:
-    def __init__(self, model_name="mistral", base_url="http://localhost:11434"):
-        self.model_name = model_name
+    def __init__(self, base_url="http://localhost:11434"):
         self.base_url = base_url
+        self.model_name = None  # 🔹 모델을 바로 지정하지 않음
+
+    def set_model(self, model_name):
+        """🔹 동적으로 모델을 설정"""
+        self.model_name = model_name
 
     def is_model_installed(self):
         """현재 설치된 Ollama 모델 목록을 확인하여 해당 모델이 있는지 검사"""
+        if not self.model_name:
+            print("❌ 모델이 설정되지 않았습니다.")
+            return False
+
         try:
             result = subprocess.run(["ollama", "list"], capture_output=True, text=True)
             return self.model_name in result.stdout
@@ -18,6 +26,10 @@ class OllamaRunner:
 
     def pull_model(self):
         """모델이 없으면 다운로드 (URL에서 가져와서 설치)"""
+        if not self.model_name:
+            print("❌ 모델이 설정되지 않았습니다.")
+            return False
+
         print(f"🔍 '{self.model_name}' 모델 확인 중...")
         if self.is_model_installed():
             print(f"✅ '{self.model_name}' 모델이 이미 설치됨.")
@@ -60,24 +72,10 @@ class OllamaRunner:
             for line in response.iter_lines():
                 if line:
                     try:
-                        data = json.loads(line)  # 여기서 변경
+                        data = json.loads(line)
                         if "response" in data:
                             generated_text += data["response"] + " "
                     except json.JSONDecodeError:
                         continue  # JSON 파싱 오류 발생 시 무시
 
             return generated_text.strip()
-        
-
-# # 실행 예제
-# if __name__ == "__main__":
-#     model_name = 'mistral'
-#     ollama = OllamaRunner(model_name=model_name)
-
-#     #터미널 직접 입력
-#     # ollama.run_model_interactive()
-
-#     #원하는 대화 파이썬 창에서 입력
-#     prompt = 'Can you debate with another AI?' #이 부분에 적을 내용 입력
-#     response = ollama.generate_text(prompt)
-#     print(f"📝 {model_name} 응답: {response}")
