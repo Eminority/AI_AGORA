@@ -157,3 +157,5 @@ class DetectPersona:
         profile_id = self.db.insert_data("object", new_profile)
         print(f"✅ 새 프로필이 생성되었습니다! (ID: {profile_id})")
         return new_profile
+    
+    
