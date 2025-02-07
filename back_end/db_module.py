@@ -1,11 +1,8 @@
 import os
 from dotenv import load_dotenv
 from pymongo import MongoClient
-<<<<<<< HEAD
-=======
 import google.generativeai as genai
 from bson.objectid import ObjectId
->>>>>>> 0b47c18293eec7c730c47d5864588fae52c9e9d1
 
 # MongoDB 연결 및 데이터 저장 클래스
 class MongoDBConnection:
