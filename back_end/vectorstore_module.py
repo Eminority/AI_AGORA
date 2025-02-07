@@ -2,6 +2,9 @@ from langchain.vectorstores import FAISS
 from langchain.embeddings import OpenAIEmbeddings
 from langchain.text_splitter import CharacterTextSplitter
 from langchain_huggingface import HuggingFaceEmbeddings
+from typing import List
+from langchain.docstore.document import Document
+from langchain.text_splitter import RecursiveCharacterTextSplitter
 
 
 def create_embedding_model():
@@ -25,20 +28,40 @@ class VectorStoreHandler:
         self.embeddings = create_embedding_model()
     
     def split_text(self, text: str) -> list:
-        splitter = CharacterTextSplitter(chunk_size=self.chunk_size, chunk_overlap=self.chunk_overlap)
+        """
+        텍스트를 일정한 크기로 분할합니다.
+        
+        :param text: 원본 텍스트 (문자열)
+        :return: 분할된 텍스트 청크 리스트 (List[Document])
+        """
+        # ✅ CharacterTextSplitter 대신 RecursiveCharacterTextSplitter 사용 (더 안정적)
+        splitter = RecursiveCharacterTextSplitter(
+            chunk_size=self.chunk_size,  # 기본값 500
+            chunk_overlap=self.chunk_overlap,  # 기본값 50
+            length_function=len,
+            separators=["\n\n", "\n", " ", ""],  # 구분자를 명확히 지정
+        )
+        
+        # ✅ 문서를 분할하여 리스트로 반환
         chunks = splitter.split_text(text)
-        return chunks
-    
+        
+        # ✅ FAISS 벡터스토어에서 사용할 수 있도록 Document 객체로 변환
+        from langchain.docstore.document import Document
+        documents = [Document(page_content=chunk) for chunk in chunks]
+
+        return documents
 
     #이후에 단순히 저장모듈로 사용해 다방면으로 활용할 수 있게 바꿀 계획
-    def vectorstoring_from_text(self, text: str) -> FAISS:
-        """
-        주제에 관한 자료(크롤링 등으로 수집한 텍스트)를 분할하여 FAISS vectorstore에 저장합니다.
+
+    def vectorstoring(self, texts: List[str]) -> FAISS:
+        # 리스트의 각 요소를 개별적으로 분할한 후, 하나의 리스트로 합침
+        chunks = []
+        for text in texts:
+            # self.split_text(text)가 Document 객체들의 리스트를 반환한다고 가정
+            chunks.extend(self.split_text(text))
         
-        :param text: 주제 관련 원본 텍스트 자료
-        :return: 생성된 FAISS 벡터 스토어 인스턴스
-        """
-        chunks = self.split_text(text)
-        vectorstore = FAISS.from_texts(chunks, self.embeddings)
-        print(f"주제 자료를 {len(chunks)}개의 청크로 분할하여 벡터 스토어에 저장했습니다.")
+        # FAISS 벡터 스토어 생성 (Document 객체들을 사용하므로 from_documents 사용)
+        vectorstore = FAISS.from_documents(chunks, self.embeddings)
+        
+        print(f"총 {len(texts)}개의 문서를 받아 {len(chunks)}개의 청크로 분할하여 벡터 스토어에 저장했습니다.")
         return vectorstore
