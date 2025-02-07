@@ -24,13 +24,13 @@ class Participant:
         self.img = img
 
     def answer(self, prompt:str = None):
+        #ai인 경우
+        if self.agora_ai:
+            return self.agora_ai.generate_text(prompt)
         # ai가 아닌 경우 = 사람인 경우
-        if not self.agora_ai:
-            #외부에서 답변 받아와서 리턴
-            pass
         else:
-            #ai인 경우
-            return agora_ai.generate_text(prompt, [])
+            return input(prompt)
+            #외부에서 답변 받아와서 리턴
 
     
 

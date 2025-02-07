@@ -1,13 +1,21 @@
+from vectorstore_module import VectorStoreHandler
+
 # participant 또는 심판으로 들어갈 ai
 class Agora_AI:
-    def __init__(ai_type, ai_instance, vectorhandler):
+    def __init__(ai_type, ai_instance, vector_handler:VectorStoreHandler=None):
         self.ai_type = ai_type
         self.ai_instance = ai_instance
-        self.vectorhandler = vectorhandler
+        self.vector_handler = vector_handler
         self.vectorstore = None
         self.crawled_data = []
 
     def set_role(role):
+        if role == "judge":
+            role = "판사 프롬프트"
+        elif role == "pos":
+            role = "주제에 대하여 찬성하라는 프롬프트"
+        elif role == "neg":
+            role = "주제에 대하여 반대하라는 프롬프트"
         if self.ai_type == "GEMINI":
             self.ai_instance.set_role(role)
 
@@ -16,10 +24,10 @@ class Agora_AI:
         self.crawled_data.extend(["crawled","data","list"])
         
     def vectorstoring():
-        self.vectorstore = vector_handler.vectorstoring_from_list(self.crawled_data)
+        self.vectorstore = self.vector_handler.vectorstoring_from_list(self.crawled_data)
 
-    def generate_text(prompt: str, crawled_text = [], max_tokens = 200):
+    def generate_text(prompt: str, k:int = 3, max_tokens:int = 200):
         if self.ai_type == "GEMINI":
-            return self.ai_instance.generate_text_with_vectorstore(prompt, crawled_text, k=3, max_tokens=max_tokens)
+            return self.ai_instance.generate_text_with_vectorstore(prompt, k=k, max_tokens=max_tokens)
         else :
             return "등록된 형태의 ai가 아닙니다."
