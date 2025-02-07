@@ -1,7 +1,11 @@
 import os
 from dotenv import load_dotenv
 from pymongo import MongoClient
+<<<<<<< HEAD
 import google.generativeai as genai
+=======
+from bson.objectid import ObjectId
+>>>>>>> 16330b23132c863fdc0f2814791b1243a5ec135a
 
 # MongoDB 연결 및 데이터 저장 클래스
 class MongoDBConnection:
@@ -20,6 +24,14 @@ class MongoDBConnection:
         except Exception as e:
             print("❌ Connection failed:", e)
 
+
+    #RDBMS 쿼리문에서의 Select문을 대체.
+    def select_data_from_id(self, collection_name: str, id:str):
+        return self.db[collection_name].find_one({"_id":ObjectId(id)})
+
+    #RDBMS 쿼리문에서의 Update문을 대체.
+    def update_data(self, collection_name: str, data:dict):
+        return self.db[collection_name].update_one(data)
 
     def close_connection(self):
         """
@@ -44,6 +56,7 @@ if __name__ == "__main__":
     # MongoDB 연결 객체 생성
     db_connection = MongoDBConnection(MONGO_URI, DB_NAME)
 
+<<<<<<< HEAD
     # 사용자로부터 프롬프트 입력 (예: 역할을 포함한 프롬프트)
     prompt_input = input("역할을 포함한 프롬프트를 입력하세요: ")
     
