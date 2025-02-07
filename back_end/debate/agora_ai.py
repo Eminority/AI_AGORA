@@ -2,7 +2,7 @@ from vectorstore_module import VectorStoreHandler
 
 # participant 또는 심판으로 들어갈 ai
 class Agora_AI:
-    def __init__(ai_type, ai_instance, vector_handler:VectorStoreHandler=None):
+    def __init__(ai_type:str, ai_instance, vector_handler:VectorStoreHandler=None):
         self.ai_type = ai_type
         self.ai_instance = ai_instance
         self.vector_handler = vector_handler

@@ -1,10 +1,10 @@
 from db_module import MongoDBConnection
 from agora_ai import Agora_AI
 from ai_module.ai_factory import AI_Factory
+from vectorstore_module import VectorStoreHandler
 class ParticipantFactory:
-    def __init__(self, vector_handler: VectorStoreHandler, db_connection: MongoDBConnection, ai_factory:AI_Factory):
-        self.vector_handler = vector_handler,
-        self.db_connection = db_connection
+    def __init__(self, vector_handler: VectorStoreHandler, ai_factory:AI_Factory):
+        self.vector_handler = vector_handler
         self.ai_factory = ai_factory
 
     def make_participant(self, data:dict=None):
@@ -29,8 +29,11 @@ class Participant:
             return self.agora_ai.generate_text(prompt)
         # ai가 아닌 경우 = 사람인 경우
         else:
+            ###########################임시 작성된 코드
+            #실제로는 외부의 입력창 등에서 답변 받아와서 리턴해야.
+            #현재는 console창에 입력을 받도록 되어있음.
             return input(prompt)
-            #외부에서 답변 받아와서 리턴
+            ###########################임시 작성된 코드
 
     
 

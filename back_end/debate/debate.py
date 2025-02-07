@@ -7,9 +7,15 @@ class Debate:
     def __init__(self,
                 participant_factory:ParticipantFactory = None,
                 db_connection:MongoDBConnection = None):
+        #판사
+        self.judge = None
+        #참가자 인스턴스
         self.pos = None
         self.neg = None
+        #DB Connection
         self.db_connection = db_connection
+        #참가자 생성기
+        self.participant_factory = participant_factory
         self.debate = {
             "_id" : id,
             "participants" : participants,
@@ -30,35 +36,16 @@ class Debate:
             },
             "result": None
         }
-        
-        #판사 정의
-        gemini_instance = participant_factory.ai_factory.create_ai_instance("GEMINI")
-        self.judge = Agora_AI(gemini_instance, vectorhandler=self.vector_handler)
-        self.judge.set_role("judge")
-        
         #오고 갈 최대 대화 수 정하기
         #서론 본론 결론으로 생각해서 일단은 3으로
         self.max_step = 3
 
 
-    #id 받아와서 객체로 만들기
-    def make_participant(self,data):
-        return Participant(data["_id"], data["name"], data["ai"], data["img"])
-    
-# 토론 진행
-# 진행중일때:
-#   발언 순서 관리
-#   debate_turn_manager()
-#       현재 진행도? 확인(서론, 본론, 결론)
-#       if 유저의 차례:
-#           발언 입력 받기.      
-#           else if AI의 차례:
-#               ai 발언 생성.
-#               prompt = "<입력할 프롬프트>"
-#               ai.generete_text(prompt)
-
-#         발언 기록
-#         log_speech(debate_id, speeker, message)
+    #판사 정의
+    def set_judge(self):
+        gemini_instance = self.participant_factory.ai_factory.create_ai_instance("GEMINI")
+        self.judge = Agora_AI(gemini_instance, vectorhandler=self.vector_handler)
+        self.judge.set_role("judge")
 
     def progress(self):
         # self.debate를 절차에 맞게 수정
@@ -66,12 +53,10 @@ class Debate:
         debate = self.debate
         # 반환할 내용에는 발언자와 내용, 시간이 있어야함.
         result = {"timestamp":"","speaker": "", "message":""}
-        if not debate["_id"]:
-            # 등록된 아이디가 없으면
-            # 주제를 입력받기
-            # 토론 참여자 선택하기
-            # 입력받은 주제를 가지고 토론 생성하기
-            self.create(topic="입력받은 주제", participants={"여기에 찬성 측, 반대 측 입력"})
+        if not debate["_id"] or (debate["_id"] and debate["status"]["step"] == end):
+            # 등록된 아이디가 없는 토론 또는 이미 종료된 토론
+            result["speaker"] = "SYSTEM"
+            result["message"] = "유효하지 않은 토론"
         else:
             # 등록된 아이디가 있는 경우
             # 현재 상태 확인
@@ -108,8 +93,8 @@ class Debate:
                 #토론 판결
                 self.end()
                 self.evaluate()
-            result["timestamp"] = datetime.now()
             self.debate["debate_log"].append(result)
+        result["timestamp"] = datetime.now()
         return result
 
     # 참가자들 준비시키기
@@ -119,7 +104,7 @@ class Debate:
             self.pos.agora_ai.crawling(self.debate["topic"])
         if self.neg.agora_ai:
             self.neg.agora_ai.crawling(self.debate["topic"])
-        #판사도 크롤링시키기
+        #판사도 준비시키기
         self.judge.crawling(self.debate["topic"])
         
 
@@ -156,7 +141,7 @@ class Debate:
     # 토론 생성
     #     토론 주제와 참여자를 받아와서 db에 등록
     def create(self, topic:str, participants:dict):
-        if self.debate["_id"] == None:
+        if self.debate["_id"] == None and participants:
             # 아직 생성되지 않은 id로 판단, 내부 정보 업데이트
             self.debate["topic"] = topic
             self.debate["participants"] = participants
@@ -166,19 +151,15 @@ class Debate:
             }
             # db에 추가 이후 키를 받아와서 토론 키를 현재 debate에 등록
             debate_id = self.db_connection.insert_data("debate", self.debate)
-            self.make_participant(participants)
+            self.participant_factory.make_participant(participants)
             self.debate["_id"] = debate_id
+            #판사 생성 및 등록
+            self.set_judge()
             return True
         else : 
             #이미 생성된 토론이므로 return False
             return False
 
-    # 토론 종료
-    def end(self):
-        self.debate["status"] = {
-            "type" : "end",
-            "step" : 0
-        }
 
     # 토론 판결
     def evaluate(self):
