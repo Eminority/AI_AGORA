@@ -1,11 +1,6 @@
 import os
 from dotenv import load_dotenv
 from pymongo import MongoClient
-<<<<<<< HEAD
-import google.generativeai as genai
-=======
-from bson.objectid import ObjectId
->>>>>>> 16330b23132c863fdc0f2814791b1243a5ec135a
 
 # MongoDB 연결 및 데이터 저장 클래스
 class MongoDBConnection:
@@ -56,7 +51,6 @@ if __name__ == "__main__":
     # MongoDB 연결 객체 생성
     db_connection = MongoDBConnection(MONGO_URI, DB_NAME)
 
-<<<<<<< HEAD
     # 사용자로부터 프롬프트 입력 (예: 역할을 포함한 프롬프트)
     prompt_input = input("역할을 포함한 프롬프트를 입력하세요: ")
     
@@ -70,5 +64,4 @@ if __name__ == "__main__":
     
     # MongoDB 연결 종료
     db_connection.close_connection()
-    
 """
