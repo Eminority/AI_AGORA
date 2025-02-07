@@ -1,11 +1,8 @@
 import os
 from dotenv import load_dotenv
 from pymongo import MongoClient
-<<<<<<< HEAD
 import google.generativeai as genai
-=======
 from bson.objectid import ObjectId
->>>>>>> 16330b23132c863fdc0f2814791b1243a5ec135a
 
 # MongoDB 연결 및 데이터 저장 클래스
 class MongoDBConnection:
@@ -24,7 +21,9 @@ class MongoDBConnection:
         except Exception as e:
             print("❌ Connection failed:", e)
 
-
+    #RDBMS에서의 insert 문을 대체
+    def insert_data(self, collection_name: str, data:dict):
+        return self.db[collection_name].insert_one(data).inserted_id
     #RDBMS 쿼리문에서의 Select문을 대체.
     def select_data_from_id(self, collection_name: str, id:str):
         return self.db[collection_name].find_one({"_id":ObjectId(id)})

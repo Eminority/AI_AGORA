@@ -3,8 +3,8 @@ import db_module
 class Debate:
     def __init__(self, judge, topic:str = None, participants: dict = None, id: str = None):
         self.judge = judge
-        self.pro = None
-        self.con = None
+        self.pos = None
+        self.neg = None
         self.debate = {
             "_id" : id,
             "participants" : participants,
@@ -30,9 +30,9 @@ class Debate:
         elif topic and participants:
             self.create(topic, participants)
         if participants :
-            self.pro, self.con = get_participant(participants)
+            self.pos, self.neg = get_participant(participants)
         else :
-            self.debate["participants"] = {"pro":None, "con":None}
+            self.debate["participants"] = {"pos":None, "neg":None}
         
 
     #id 받아와서 객체로 만들기
@@ -75,10 +75,10 @@ class Debate:
                 # 토론이 진행중인 경우
                 # 현재 차례인 쪽에게서 답변 받기
                 # AI 차례라면 적절한 AI에게서 답변 생성
-                if status["turn"] == "pro":
+                if status["turn"] == "pos":
                     # 찬성측 발언 받기
                     pass
-                elif status["turn"] == "con":
+                elif status["turn"] == "neg":
                     #반대측 발언 받기
                     pass
             elif status["type"] == "end":
@@ -114,7 +114,7 @@ class Debate:
                 "step": 0
             }
             # db에 추가 이후 키를 받아와서 토론 키를 현재 debate에 등록
-            debate_id = db_connection.insert_conversation("debate", self.debate)
+            debate_id = db_connection.insert_data("debate", self.debate)
             self.debate["_id"] = debate_id
             return True
         else : 
@@ -144,8 +144,8 @@ class Debate:
     def summarize(summarize_model):
         # summarize_model 불러와서 요약하기
         summary = self.debate["summary"]
-        summary["summarize_pro"] = "",
-        summary["summarize_con"] = "",
+        summary["summarize_pos"] = "",
+        summary["summarize_neg"] = "",
         summary["summarize_argument"] = "",
         summary["summarize_verdict"] = ""
 
