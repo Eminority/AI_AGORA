@@ -3,13 +3,16 @@ import db_module
 class Debate:
     def __init__(self, judge, topic:str = None, participants: dict = None, id: str = None):
         self.judge = judge
+        self.pro = None
+        self.con = None
         self.debate = {
             "_id" : id,
             "participants" : participants,
             "topic" : None,
             "status" : {
-                "type": None,
-                "step": 0
+                "type": None, 
+                "step": 0,
+                "turn": None
             },
             "debate_log": [],
             "start_time": None,
@@ -26,10 +29,65 @@ class Debate:
             self.load()
         elif topic and participants:
             self.create(topic, participants)
-        
-        if not participants:
+        if participants :
+            self.pro, self.con = get_participant(participants)
+        else :
             self.debate["participants"] = {"pro":None, "con":None}
         
+
+    #id 받아와서 객체로 만들기
+    def get_participant(participants):
+        pass
+    
+# 토론 진행
+# 진행중일때:
+#   발언 순서 관리
+#   debate_turn_manager()
+#       현재 진행도? 확인(서론, 본론, 결론)
+#       if 유저의 차례:
+#           발언 입력 받기.      
+#           else if AI의 차례:
+#               ai 발언 생성.
+#               prompt = "<입력할 프롬프트>"
+#               ai.generete_text(prompt)
+
+#         발언 기록
+#         log_speech(debate_id, speeker, message)
+
+    def progress(self, db_connection: MongoDBConnection):
+        # self.debate를 절차에 맞게 수정
+        # 이후 return self.debate
+        debate = self.debate
+        if not debate["_id"]:
+            # 등록된 아이디가 없으면
+            # 주제를 받기
+            # 시작하기
+            pass
+        else:
+            # 등록된 아이디가 있는 경우
+            # 현재 상태 확인
+            status = debate["status"]
+            if status["type"] == "start":
+                # 토론이 생성만 된 상태인 경우
+                # 주제 표시하기
+                pass
+            elif status["type"] == "in_progress":
+                # 토론이 진행중인 경우
+                # 현재 차례인 쪽에게서 답변 받기
+                # AI 차례라면 적절한 AI에게서 답변 생성
+                if status["turn"] == "pro":
+                    # 찬성측 발언 받기
+                    pass
+                elif status["turn"] == "con":
+                    #반대측 발언 받기
+                    pass
+            elif status["type"] == "end":
+                #토론이 끝난 경우
+                #토론 판결, 토론 종료
+                pass
+        # 변경사항 저장
+        self.save(db_connection)
+            
 
 
 
@@ -62,26 +120,6 @@ class Debate:
         else : 
             #이미 생성된 토론이므로 return False
             return False
-
-# 토론 진행
-# 진행중일때:
-#   발언 순서 관리
-#   debate_turn_manager()
-#       현재 진행도? 확인(서론, 본론, 결론)
-#       if 유저의 차례:
-#           발언 입력 받기.      
-#           else if AI의 차례:
-#               ai 발언 생성.
-#               prompt = "<입력할 프롬프트>"
-#               ai.generete_text(prompt)
-
-#         발언 기록
-#         log_speech(debate_id, speeker, message)
-
-    #토론이 종료되면
-    #   end()
-    #   save(db_connect)
-
 
     # 토론 종료
     def end(self):
