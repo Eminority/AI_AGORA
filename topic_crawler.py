@@ -78,6 +78,6 @@ if __name__ == "__main__":
 
     print("\n🔍 크롤링된 기사:")
     for idx, article in enumerate(articles, 1):
-        print(f"\n📌 {idx}. {article['title']}\n{article['content'][:500]}...")  # 긴 본문은 앞부분만 표시
+        print(f"\n📌 {idx}. {article['title']}\n{article['content']}...")  
 
     crawler.close()
