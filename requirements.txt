@@ -1,10 +1,11 @@
 requests
 beautifulsoup4
-regex
+selenium
 git+https://github.com/MarioVilas/googlesearch.git
 spacy
 wikipedia
 opencv-python
-subprocess
-json
-ollama
+webdriver_manager
+
+
+
