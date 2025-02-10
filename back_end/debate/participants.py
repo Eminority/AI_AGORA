@@ -1,19 +1,21 @@
 from db_module import MongoDBConnection
-from agora_ai import Agora_AI
-from ai_module.ai_factory import AI_Factory
+from .agora_ai import Agora_AI
+from .ai_module.ai_factory import AI_Factory
 from vectorstore_module import VectorStoreHandler
 class ParticipantFactory:
     def __init__(self, vector_handler: VectorStoreHandler, ai_factory:AI_Factory):
         self.vector_handler = vector_handler
         self.ai_factory = ai_factory
 
-    def make_participant(self, data:dict=None):
+    def make_participant(self, data: dict = None):
         ai_type = data["ai"]
         # ai type을 기반으로 instance 만들어주기
         ai_instance = self.ai_factory.create_ai_instance(ai_type)
-        #만들어진 ai instance를 참가자 형태로 만들기
+        # 만들어진 ai instance를 참가자 형태로 만들기
         agora_ai = Agora_AI(ai_type, ai_instance, self.vector_handler)
-        return Participant(id = data["_id"], name = data["name"], ai = agora_ai, img = data["img"])
+        return Participant(id=data["_id"], name=data["name"], agora_ai=agora_ai, img=data["img"])
+
+
 
 class Participant:
     #db에서의 _id, name, 사용할 ai, 프로필 사진을 받아오기.

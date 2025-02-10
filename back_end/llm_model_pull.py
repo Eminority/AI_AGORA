@@ -1,6 +1,7 @@
 import json
 import requests
 import subprocess
+import ollama
 
 class OllamaRunner:
     def __init__(self, model_name="mistral", base_url="http://localhost:11434"):
@@ -68,16 +69,39 @@ class OllamaRunner:
 
             return generated_text.strip()
         
+    def generate_text_with_vectorstore(self, user_prompt: str, vectorstore, k: int = 3, max_tokens: int = 200) -> str:
+        """
+        벡터스토어에서 관련 컨텍스트를 검색한 후, 이를 포함하여 Ollama 모델로 답변을 생성합니다.
+        
+        :param user_prompt: 사용자 입력 프롬프트
+        :param vectorstore: FAISS 등 벡터스토어 인스턴스
+        :param k: 유사도 검색 시 반환할 문서 수 (기본값: 3)
+        :param max_tokens: 생성할 최대 토큰 수 (Ollama에서 해당 옵션이 지원되는 경우 활용 가능)
+        :return: 생성된 텍스트
+        """
+        try:
+            # 벡터스토어에서 유사 문서 검색
+            search_results = vectorstore.similarity_search(user_prompt, k=k)
+            context = "\n".join([doc.page_content for doc in search_results])
+        except Exception as e:
+            context = ""
+            print(f"벡터스토어 검색 실패: {e}")
+
+        # Ollama에 전달할 프롬프트 생성
+        full_prompt = f"Context:\n{context}\n\nUser: {user_prompt}"
+
+        # Ollama API 호출 (generate_text 이용)
+        # Ollama가 max_tokens 제한을 직접 지원하지 않는다면, 아래에서 별도로 처리되지 않음
+        response = self.generate_text(full_prompt)
+        return response
+    
 
 # # 실행 예제
-# if __name__ == "__main__":
-#     model_name = 'mistral'
-#     ollama = OllamaRunner(model_name=model_name)
+if __name__ == "__main__":
+    model_name = 'mistral'
+    ollama = OllamaRunner(model_name=model_name) 
+    ollama.run_model_interactive()
 
-#     #터미널 직접 입력
-#     # ollama.run_model_interactive()
-
-#     #원하는 대화 파이썬 창에서 입력
-#     prompt = 'Can you debate with another AI?' #이 부분에 적을 내용 입력
-#     response = ollama.generate_text(prompt)
-#     print(f"📝 {model_name} 응답: {response}")
+    prompt = 'Can you debate with another AI?' #이 부분에 적을 내용 입력
+    response = ollama.generate_text(prompt)
+    print(f"📝 {model_name} 응답: {response}")

@@ -1,182 +1,223 @@
+import uuid
+import time
 from datetime import datetime
 from db_module import MongoDBConnection
-from participants import Participant, ParticipantFactory
-from agora_ai import Agora_AI
-from datetime import datetime
+from .participants import ParticipantFactory
+from .agora_ai import Agora_AI
+
 class Debate:
-    def __init__(self,
-                participant_factory:ParticipantFactory = None,
-                db_connection:MongoDBConnection = None):
-        #판사
+    def __init__(self, participant_factory: ParticipantFactory = None, db_connection: MongoDBConnection = None, vector_handler=None):
         self.judge = None
-        #참가자 인스턴스
         self.pos = None
         self.neg = None
-        #DB Connection
         self.db_connection = db_connection
-        #참가자 생성기
         self.participant_factory = participant_factory
+        self.vector_handler = vector_handler
+
+        # debate 필드 초기화
         self.debate = {
-            "_id" : id,
-            "participants" : participants,
-            "topic" : None,
-            "status" : {
-                "type": None, 
-                "step": 0,
+            "_id": None,
+            "participants": None,
+            "topic": None,
+            "status": {
+                "type": None,  # "in_progress" 또는 "end" 등
+                "step": 0,     # 1부터 11까지 단계
                 "turn": None
             },
             "debate_log": [],
             "start_time": None,
             "end_time": None,
             "summary": {
-                "summary_pro":None,
-                "summary_con":None,
+                "summary_pos": None,
+                "summary_neg": None,
                 "summary_arguments": None,
                 "summary_verdict": None
             },
             "result": None
         }
-        #오고 갈 최대 대화 수 정하기
-        #서론 본론 결론으로 생각해서 일단은 3으로
-        self.max_step = 3
 
+        # 총 11단계 진행
+        self.max_step = 11
 
-    #판사 정의
     def set_judge(self):
+        """판사 역할의 AI 인스턴스 생성 및 역할 설정"""
         gemini_instance = self.participant_factory.ai_factory.create_ai_instance("GEMINI")
-        self.judge = Agora_AI(gemini_instance, vectorhandler=self.vector_handler)
+        self.judge = Agora_AI(ai_type="GEMINI", ai_instance=gemini_instance, vector_handler=self.vector_handler)
         self.judge.set_role("judge")
 
-    def progress(self):
-        # self.debate를 절차에 맞게 수정
-        # 이후 return self.debate
-        debate = self.debate
-        # 반환할 내용에는 발언자와 내용, 시간이 있어야함.
-        result = {"timestamp":"","speaker": "", "message":""}
-        if not debate["_id"] or (debate["_id"] and debate["status"]["step"] == end):
-            # 등록된 아이디가 없는 토론 또는 이미 종료된 토론
-            result["speaker"] = "SYSTEM"
-            result["message"] = "유효하지 않은 토론"
-        else:
-            # 등록된 아이디가 있는 경우
-            # 현재 상태 확인
-            status = debate["status"]
-            if status["type"] == "start":
-                # 토론이 주제와 참가자를 받아 생성된 상태일 때
-                # 토론 준비 시키기
-                self.ready_to_debate()
-                #준비가 끝났다면 판사가 주제를 간단하게 말하게 하기
-                result["speaker"] = "judge"
-                result["message"] = self.judge.generate_text("주제에 대해 말해달라는 프롬프트")
-                #토론을 시작으로 상태 변경
-                self.next_turn()
-            elif status["type"] == "in_progress":
-                # 토론이 진행중인 경우
-                # status["step"]:int 에 따라서 진행도 생각하기
-
-                # 현재 차례인 쪽에게서 답변 받기
-                # AI 차례라면 적절한 AI에게서 답변 생성
-                if status["turn"] == "pos":
-                    result["speaker"] = "pos"
-                    result["message"] = self.pos.answer("찬성측 발언 요청 프롬프트")
-                elif status["turn"] == "neg":
-                    result["speaker"] = "neg"
-                    result["message"] = self.neg.answer("반대측 발언 요청 프롬프트")
-                    pass
-                elif status["turn"] == "judge":
-                    result["speaker"] = "judge"
-                    result["message"] = self.judge.generate_text("판사측 발언 요청 프롬프트")
-                #차례 넘기기
-                self.next_turn()
-            elif status["type"] == "end":
-                #토론이 끝난 경우
-                #토론 판결
-                result["message"] = self.evaluate()
-            self.debate["debate_log"].append(result)
-        result["timestamp"] = datetime.now()
-        return result
-
-    # 참가자들 준비시키기
-    def ready_to_debate():
-        #참가자가 AI라면 준비(크롤링)시키기
-        if self.pos.agora_ai:
-            self.pos.agora_ai.crawling(self.debate["topic"])
-        if self.neg.agora_ai:
-            self.neg.agora_ai.crawling(self.debate["topic"])
-        #판사도 준비시키기
-        self.judge.crawling(self.debate["topic"])
-        
-
-    #토론 다음 순서로 넘기기
-    def next_turn():
-        status = self.debate["status"]
-        if status["type"] == "start":
-            status["type"] = "in_progress"
-        elif status["type"] == "in_progress" and status["turn"] >= self.max_step:
-            status["type"] = "end"
-        #대화 순서 정하기
-        if status["turn"] == None or "judge":
-            status["turn"] = "pos" #판사 또는 발언 전이라면 찬성측
-            #진행도 +1
-            status["step"] += 1
-        elif status["turn"] == "pos":
-            status["turn"] = "neg" #찬성측 발언 후에는 반대측
-        elif status["turn"] == "neg":
-            status["turn"] = "judge" #반대측 발언 후에는 판사 정리발언?
-
-        
-
-    # 기존 진행중인 토론 load - 자신이 가진 키를 기준으로 load.
-    def load(self):
-        # db에서 기록된 토론 정보 불러와서 덮어쓰기.
-        try:
-            self.debate = self.db_connection.select_data_from_id("debate", self.debate["_id"])
-        except Exception as e :
-            print("load failed : ", e)
+    def create(self, topic: str, participants: dict):
+        """
+        토론 생성: 새로운 토론(_id, topic, participants 등) 정보를 세팅하고
+        DB에 저장한 뒤, 판사와 참가자들을 준비합니다.
+        """
+        if self.debate["_id"] is not None or not participants:
             return False
-        
+
+        self.debate["topic"] = topic
+        self.debate["participants"] = participants
+        self.debate["status"] = {
+            "type": "in_progress",  # 토론을 시작할 때 바로 in_progress로 설정
+            "step": 1,              # 1단계부터 진행
+            "turn": None
+        }
+
+        # _id 필드를 UUID로 생성하여 할당
+        self.debate["_id"] = str(uuid.uuid4())
+
+        # DB에 삽입 후 실제 _id(또는 ObjectId) 값을 debate dict에 반영
+        debate_id = self.db_connection.insert_data("debate", self.debate)
+        self.debate["_id"] = debate_id
+
+        # 참가자 생성 (pos, neg)
+        self.pos = self.participant_factory.make_participant(participants["pos"])
+        self.neg = self.participant_factory.make_participant(participants["neg"])
+
+        # 판사 생성 및 등록
+        self.set_judge()
+
         return True
 
-    # 토론 생성
-    #     토론 주제와 참여자를 받아와서 db에 등록
-    def create(self, topic:str, participants:dict):
-        if self.debate["_id"] == None and participants:
-            # 아직 생성되지 않은 id로 판단, 내부 정보 업데이트
-            self.debate["topic"] = topic
-            self.debate["participants"] = participants
-            self.debate["status"] = {
-                "type": "start",
-                "step": 0
-            }
-            # db에 추가 이후 키를 받아와서 토론 키를 현재 debate에 등록
-            debate_id = self.db_connection.insert_data("debate", self.debate)
-            self.participant_factory.make_participant(participants)
-            self.debate["_id"] = debate_id
-            #판사 생성 및 등록
-            self.set_judge()
-            return True
-        else : 
-            #이미 생성된 토론이므로 return False
-            return False
+    def progress(self):
+        """
+        11단계 순서:
+          1) 판사가 주제 설명
+          2) 찬성측 주장
+          3) 반대측 주장
+          4) 판사가 변론 준비시간(1초) 부여
+          5) 반대측 변론
+          6) 찬성측 변론
+          7) 판사가 최종 주장 시간(1초) 부여
+          8) 찬성측 최종 결론
+          9) 반대측 최종 결론
+          10) 판사가 판결 준비시간(1초) 부여
+          11) 판사 최종 결론 (evaluate)
+        """
+        debate = self.debate
+        result = {"timestamp": None, "speaker": "", "message": ""}
 
+        # 유효하지 않은 토론이면 메시지 반환
+        if debate["_id"] is None:
+            result["speaker"] = "SYSTEM"
+            result["message"] = "유효하지 않은 토론입니다."
+            result["timestamp"] = datetime.now()
+            return result
 
-    # 토론 판결
+        # 단계(step)가 설정되어 있지 않다면 1로 초기화
+        if "step" not in debate["status"]:
+            debate["status"]["step"] = 1
+        step = debate["status"]["step"]
+
+        # 단계별 로직
+        if step == 1:
+            # 1. 판사가 주제 설명
+            # (필요시 토론 준비 작업)
+            self.ready_to_debate()
+            result["speaker"] = "judge"
+            result["message"] = self.judge.generate_text("주제(Topic)에 대한 소개 발언 프롬프트")
+
+        elif step == 2:
+            # 2. 찬성측 주장
+            result["speaker"] = "pos"
+            result["message"] = self.pos.answer("찬성측 주장 발언 프롬프트")
+
+        elif step == 3:
+            # 3. 반대측 주장
+            result["speaker"] = "neg"
+            result["message"] = self.neg.answer("반대측 주장 발언 프롬프트")
+
+        elif step == 4:
+            # 4. 판사가 변론 준비시간 1초 제공
+            result["speaker"] = "judge"
+            result["message"] = "변론 준비 시간 1초를 갖겠습니다."
+            time.sleep(1)
+
+        elif step == 5:
+            # 5. 반대측 변론
+            result["speaker"] = "neg"
+            result["message"] = self.neg.answer("반대측 변론 프롬프트")
+
+        elif step == 6:
+            # 6. 찬성측 변론
+            result["speaker"] = "pos"
+            result["message"] = self.pos.answer("찬성측 변론 프롬프트")
+
+        elif step == 7:
+            # 7. 판사가 최종 주장 시간(1초) 부여
+            result["speaker"] = "judge"
+            result["message"] = "최종 주장 준비 시간 1초를 갖겠습니다."
+            time.sleep(1)
+
+        elif step == 8:
+            # 8. 찬성측 최종 결론
+            result["speaker"] = "pos"
+            result["message"] = self.pos.answer("찬성측 최종 결론 프롬프트")
+
+        elif step == 9:
+            # 9. 반대측 최종 결론
+            result["speaker"] = "neg"
+            result["message"] = self.neg.answer("반대측 최종 결론 프롬프트")
+
+        elif step == 10:
+            # 10. 판사가 판결 준비시간(1초) 부여
+            result["speaker"] = "judge"
+            result["message"] = "판결 준비 시간 1초를 갖겠습니다."
+            time.sleep(1)
+
+        elif step == 11:
+            # 11. 판사가 최종 결론
+            result["speaker"] = "judge"
+            result["message"] = self.evaluate()  # evaluate() 내부에서 self.summarize() 등 수행
+            # 모든 단계가 끝났으므로 토론 종료
+            debate["status"]["type"] = "end"
+
+        else:
+            # 1~11 범위를 벗어난 경우
+            result["speaker"] = "SYSTEM"
+            result["message"] = "이미 모든 토론 단계가 종료되었습니다."
+
+        # 로그에 기록
+        debate["debate_log"].append(result)
+        result["timestamp"] = datetime.now()
+
+        # 아직 11단계가 아니면 다음 단계로 증가
+        if step < self.max_step:
+            debate["status"]["step"] += 1
+
+        return result
+
+    def ready_to_debate(self):
+        """참가자와 판사가 토론 주제에 대해 미리 자료 수집/준비를 수행"""
+        topic = self.debate["topic"]
+        if self.pos and hasattr(self.pos, 'agora_ai'):
+            self.pos.agora_ai.crawling(topic)
+        if self.neg and hasattr(self.neg, 'agora_ai'):
+            self.neg.agora_ai.crawling(topic)
+        if self.judge:
+            self.judge.crawling(topic)
+
     def evaluate(self):
-        self.debate["result"] = self.judge.generate_text("판결문을 달라는 프롬프트 입력")
+        """판사가 최종 판결문(결론)을 생성하고, 토론 내용을 요약"""
+        self.debate["result"] = self.judge.generate_text("판사의 최종 판결문 요청 프롬프트")
         self.summarize()
         return self.debate["result"]
 
-
-
-    # 진행된 토론 요약
-    def summarize(summarize_model):
-        # summarize_model 불러와서 요약하기
+    def summarize(self):
+        """토론 내용을 요약(필요 시 요약 로직 적용 가능)"""
         summary = self.debate["summary"]
-        summary["summarize_pos"] = "",
-        summary["summarize_neg"] = "",
-        summary["summarize_argument"] = "",
-        summary["summarize_verdict"] = ""
+        summary["summary_pos"] = ""
+        summary["summary_neg"] = ""
+        summary["summary_arguments"] = ""
+        summary["summary_verdict"] = ""
 
-    #진행된 토론 db에 올리기
+    def load(self):
+        """데이터베이스에서 저장된 토론 정보를 불러와 현재 객체에 저장"""
+        try:
+            self.debate = self.db_connection.select_data_from_id("debate", self.debate["_id"])
+        except Exception as e:
+            print("load failed:", e)
+            return False
+        return True
+
     def save(self):
+        """현재 토론 상태를 데이터베이스에 업데이트하여 저장"""
         self.db_connection.update_data("debate", self.debate)

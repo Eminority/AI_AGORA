@@ -1,6 +1,5 @@
 import google.generativeai as genai
 
-
 # GeminiAPI: 기존 Gemini API를 사용하며, 벡터스토어 기반 컨텍스트 활용 기능을 추가합니다.
 
 
