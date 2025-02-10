@@ -178,6 +178,7 @@ class Debate:
         # 로그에 기록
         debate["debate_log"].append(result)
         result["timestamp"] = datetime.now()
+        # self.save()
 
         # 아직 11단계가 아니면 다음 단계로 증가
         if step < self.max_step:

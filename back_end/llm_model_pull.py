@@ -98,7 +98,7 @@ class OllamaRunner:
 
 # # 실행 예제
 if __name__ == "__main__":
-    model_name = 'mistral'
+    model_name = 'mixtral'
     ollama = OllamaRunner(model_name=model_name) 
     ollama.run_model_interactive()
 
