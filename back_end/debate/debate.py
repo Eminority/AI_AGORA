@@ -91,8 +91,7 @@ class Debate:
             elif status["type"] == "end":
                 #토론이 끝난 경우
                 #토론 판결
-                self.end()
-                self.evaluate()
+                result["message"] = self.evaluate()
             self.debate["debate_log"].append(result)
         result["timestamp"] = datetime.now()
         return result
@@ -165,6 +164,7 @@ class Debate:
     def evaluate(self):
         self.debate["result"] = self.judge.generate_text("판결문을 달라는 프롬프트 입력")
         self.summarize()
+        return self.debate["result"]
 
 
 

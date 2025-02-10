@@ -14,7 +14,7 @@ if __name__ == "__main__":
     load_dotenv()  # .env 파일 로드
 
     MONGO_URI = os.getenv("MONGO_URI")
-    DB_NAME = os.getenv("DB_NAME") or "gemini_db"
+    DB_NAME = os.getenv("DB_NAME")
 
     for var_name, var_value in [("MONGO_URI", MONGO_URI),
                                 ("DB_NAME", DB_NAME)]:

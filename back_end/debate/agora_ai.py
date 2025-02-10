@@ -29,5 +29,7 @@ class Agora_AI:
     def generate_text(prompt: str, k:int = 3, max_tokens:int = 200):
         if self.ai_type == "GEMINI":
             return self.ai_instance.generate_text_with_vectorstore(prompt, k=k, max_tokens=max_tokens)
+        elif self.ai_type == "OLLAMA":
+            return " "
         else :
             return "등록된 형태의 ai가 아닙니다."
