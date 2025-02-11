@@ -1,6 +1,6 @@
 {% extends 'layout/body.html' %}
 
-{% block title %} Home {% endblock %}
+{% block title %} AI Agora {% endblock %}
 
 
 {% block content %}
@@ -14,6 +14,7 @@
     {% include 'layout/chat.html' %}
 
     <script src="{{ url_for('static', path='js/chat.js') }}"></script>
+    <script src="{{ url_for('static', path='js/autoprogress_debate.js') }}"></script>
 
     <script>
         document.addEventListener("DOMContentLoaded", async function() {
@@ -43,6 +44,13 @@
                         addMessageToChat(sender, message, "received");
                     });
                 }
+
+                 // 📌 AI 토론자가 존재하면 자동으로 `/debate/progress` 요청을 반복 실행
+                 if (data.participants.pos.ai && data.participants.neg.ai) {
+                    document.querySelector(".chat-input").style.display = "none";
+                    autoProgressDebate(debateId);
+                }
+
             } catch (error) {
                 console.error("데이터 불러오기 실패:", error);
             }
