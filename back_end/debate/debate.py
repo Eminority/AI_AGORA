@@ -107,6 +107,9 @@ class Debate:
             debate["status"]["step"] = 1
         step = debate["status"]["step"]
 
+        #토론 준비시간, default 1초로 설정, 이후 추가 조정
+        delay = 1
+
         # 단계별 로직
         if step == 1:
             # 1. 판사가 주제 설명
@@ -128,8 +131,8 @@ class Debate:
         elif step == 4:
             # 4. 판사가 변론 준비시간 1초 제공
             result["speaker"] = "judge"
-            result["message"] = "You will have 1 second to prepare your argument."
-            time.sleep(1)
+            result["message"] = f"You will have {delay} second to prepare your argument."
+            time.sleep(delay)
 
         elif step == 5:
             # 5. 반대측 변론
@@ -144,8 +147,8 @@ class Debate:
         elif step == 7:
             # 7. 판사가 최종 주장 시간(1초) 부여
             result["speaker"] = "judge"
-            result["message"] = "You will have 1 second to prepare your final argument."
-            time.sleep(1)
+            result["message"] = f"You will have {delay} second to prepare your final argument."
+            time.sleep(delay)
 
         elif step == 8:
             # 8. 찬성측 최종 결론
@@ -160,8 +163,8 @@ class Debate:
         elif step == 10:
             # 10. 판사가 판결 준비시간(1초) 부여
             result["speaker"] = "judge"
-            result["message"] = "판결 준비 시간 1초를 갖겠습니다."
-            time.sleep(1)
+            result["message"] = f"I will take {delay} second to prepare the verdict."
+            time.sleep(delay)
 
         elif step == 11:
             # 11. 판사가 최종 결론

@@ -20,19 +20,14 @@ class OllamaRunner:
 
     def pull_model(self):
         """모델이 없으면 다운로드 (URL에서 가져와서 설치)"""
-        if self.model_installed:  # 이미 모델이 설치된 경우 다운로드 하지 않음
-            print(f"✅ '{self.model_name}' 모델이 이미 설치됨.")
-            return True
-
-        print(f"🔍 '{self.model_name}' 모델 확인 중...")
-
-        if self.is_model_installed():
+        if self.model_installed or self.is_model_installed():  
             print(f"✅ '{self.model_name}' 모델이 이미 설치됨.")
             self.model_installed = True
             return True
 
-        print(f"📥 '{self.model_name}' 모델 다운로드 중...")
+        print(f"🔍 '{self.model_name}' 모델 확인 중...")
 
+        print(f"📥 '{self.model_name}' 모델 다운로드 중...")
         url = f"{self.base_url}/api/pull"
         response = requests.post(url, json={"name": self.model_name})
 
@@ -43,7 +38,7 @@ class OllamaRunner:
         else:
             print(f"⚠️ 다운로드 실패: {response.text}")
             return False
-
+        
     def run_model_interactive(self):
         """Ollama 모델을 터미널에서 직접 실행 ('ollama run <model>')"""
         if not self.pull_model():
