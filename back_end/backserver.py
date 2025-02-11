@@ -56,6 +56,15 @@ def progress_debate(id:str):
     
     return {"progress": debateManager.debatepool[id].progress()}
 
+@app.get("debate/history")
+def get_debate_history(id:str):
+    if debateManager.debatepool[id]:
+        return debateManager.debatepool[id].debate["debate_log"]
+    else:
+        return []
+
+
+#실행중인 토론 목록 받아오기
 @app.get("debate/list")
 def get_debate_list():
     debatelist = {}
