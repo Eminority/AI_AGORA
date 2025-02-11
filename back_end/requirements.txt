@@ -10,3 +10,4 @@ langchain-huggingface
 fastapi
 uvicorn
 ollama
+python-multipart

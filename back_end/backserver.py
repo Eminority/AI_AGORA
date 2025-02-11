@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, Form, Query
 import os
 import json
 from dotenv import load_dotenv
@@ -7,6 +7,7 @@ from debate.debate_manager import DebateManager
 from debate.participants import ParticipantFactory
 from db_module import MongoDBConnection
 from vectorstore_module import VectorStoreHandler
+
 
 # 환경 변수 로드
 load_dotenv()
@@ -39,8 +40,16 @@ debateManager = DebateManager(participant_factory=participant_factory, db_connec
 
 # 토론 생성 API
 @app.post("/debate")
-def create_debate(pos_name: str, pos_ai: str, neg_name: str, neg_ai: str, topic: str):
-    debate_id = debateManager.create_debate(pos_name, pos_ai, neg_name, neg_ai, topic)
+def create_debate(pos_name: str = Form(...),
+                  pos_ai: str = Form(...),
+                  neg_name: str = Form(...),
+                  neg_ai: str = Form(...),
+                  topic: str = Form(...)):
+    debate_id = debateManager.create_debate(pos_name,
+                                            pos_ai,
+                                            neg_name,
+                                            neg_ai,
+                                            topic)
     return {"message": "토론이 생성되었습니다.", "topic": topic, "id":debate_id}
 
 # 토론 상태 확인 API
@@ -56,16 +65,17 @@ def progress_debate(id:str):
     
     return {"progress": debateManager.debatepool[id].progress()}
 
-@app.get("debate/history")
-def get_debate_history(id:str):
+# 토론 전체 받아오기
+@app.get("/debate/info")
+def get_debate_history(id:str = Query(..., description="토론 id")):
     if debateManager.debatepool[id]:
-        return debateManager.debatepool[id].debate["debate_log"]
+        return debateManager.debatepool[id].debate
     else:
         return []
 
 
 #실행중인 토론 목록 받아오기
-@app.get("debate/list")
+@app.get("/debate/list")
 def get_debate_list():
     debatelist = {}
     for id in debateManager.debatepool.keys():
