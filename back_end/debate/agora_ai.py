@@ -1,5 +1,5 @@
 from vectorstore_module import VectorStoreHandler
-
+from crawler_summary import DebateDataProcessor
 # participant 또는 심판으로 들어갈 ai
 class Agora_AI:
     def __init__(self, ai_type:str, ai_instance, vector_handler:VectorStoreHandler=None):
@@ -8,6 +8,8 @@ class Agora_AI:
         self.vector_handler = vector_handler if vector_handler is not None else VectorStoreHandler()  # 기본 핸들러 설정
         self.vectorstore = None
         self.crawled_data = []
+        self.debate_processor = DebateDataProcessor()  
+
 
     def set_role(self, role):
         if role == "judge":
@@ -19,9 +21,20 @@ class Agora_AI:
         if self.ai_type == "GEMINI":
             self.ai_instance.set_role(role)
 
-    def crawling(self, topic:str):
-        #주제와 self.role을 기반으로 crawling해서 crawled_data에 집어넣기.
-        self.crawled_data.extend(["crawled","data","list"])
+    def crawling(self, topic: str):
+        """ 주제와 관련된 기사들을 크롤링하여 crawled_data에 저장 """
+        articles = self.debate_processor.get_articles(topic)  # DebateDataProcessor의 get_articles 호출
+        
+        if not articles:
+            print("❌ 크롤링된 데이터가 없습니다.")
+            return
+
+        print(f"✅ {len(articles)}개의 기사 크롤링 완료!")
+        
+        # 크롤링된 데이터를 crawled_data에 추가
+        self.crawled_data.extend(articles)
+        
+        # 벡터 저장 함수 호출
         self.vectorstoring()
         
     def vectorstoring(self):

@@ -107,9 +107,6 @@ class Debate:
             debate["status"]["step"] = 1
         step = debate["status"]["step"]
 
-        #토론 준비시간, default 1초로 설정, 이후 추가 조정
-        delay = 1
-
         # 단계별 로직
         if step == 1:
             # 1. 판사가 주제 설명
@@ -131,8 +128,8 @@ class Debate:
         elif step == 4:
             # 4. 판사가 변론 준비시간 1초 제공
             result["speaker"] = "judge"
-            result["message"] = f"You will have {delay} second to prepare your argument."
-            time.sleep(delay)
+            result["message"] = "You will have 1 second to prepare your argument."
+            time.sleep(1)
 
         elif step == 5:
             # 5. 반대측 변론
@@ -147,8 +144,8 @@ class Debate:
         elif step == 7:
             # 7. 판사가 최종 주장 시간(1초) 부여
             result["speaker"] = "judge"
-            result["message"] = f"You will have {delay} second to prepare your final argument."
-            time.sleep(delay)
+            result["message"] = "You will have 1 second to prepare your final argument."
+            time.sleep(1)
 
         elif step == 8:
             # 8. 찬성측 최종 결론
@@ -163,8 +160,8 @@ class Debate:
         elif step == 10:
             # 10. 판사가 판결 준비시간(1초) 부여
             result["speaker"] = "judge"
-            result["message"] = f"I will take {delay} second to prepare the verdict."
-            time.sleep(delay)
+            result["message"] = "판결 준비 시간 1초를 갖겠습니다."
+            time.sleep(1)
 
         elif step == 11:
             # 11. 판사가 최종 결론
@@ -183,7 +180,7 @@ class Debate:
         # 로그에 기록
         debate["debate_log"].append(result)
         result["timestamp"] = datetime.now()
-        # self.save()
+        self.save()
 
         # 아직 11단계가 아니면 다음 단계로 증가
         if step < self.max_step:
@@ -194,6 +191,8 @@ class Debate:
     def ready_to_debate(self):
         """참가자와 판사가 토론 주제에 대해 미리 자료 수집/준비를 수행"""
         topic = self.debate["topic"]
+
+
         if self.pos and hasattr(self.pos, 'agora_ai'):
             self.pos.agora_ai.crawling(topic)
             self.pos.agora_ai.set_role(f"Prompt affirming the topic of {topic}")

@@ -30,7 +30,7 @@ class MongoDBConnection:
 
     #RDBMS 쿼리문에서의 Update문을 대체.
     def update_data(self, collection_name: str, data:dict):
-        return self.db[collection_name].update_one(data)
+        return self.db[collection_name].update_one({"_id":data["_id"]}, {"$set":data})
 
     def close_connection(self):
         """

@@ -10,3 +10,6 @@ langchain-huggingface
 fastapi
 uvicorn
 ollama
+selenium
+beautifulsoup4
+webdriver-manager
