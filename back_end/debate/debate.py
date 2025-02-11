@@ -113,12 +113,12 @@ class Debate:
             # (필요시 토론 준비 작업)
             self.ready_to_debate()
             result["speaker"] = "judge"
-            result["message"] = self.judge.generate_text("주제(Topic)에 대한 소개 발언 프롬프트")
+            result["message"] = self.judge.generate_text("System:judge\nContext:topic\nUser:Tell me about the gist of the argument")
 
         elif step == 2:
             # 2. 찬성측 주장
             result["speaker"] = "pos"
-            result["message"] = self.pos.answer("찬성측 주장 발언 프롬프트")
+            result["message"] = self.pos.answer("System:positive\nContext:Comments in favor of the topic\nUser:tell me your opinion on the topic, including supporting evidence.")
 
         elif step == 3:
             # 3. 반대측 주장
