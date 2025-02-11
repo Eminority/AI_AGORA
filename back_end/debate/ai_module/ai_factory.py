@@ -1,5 +1,5 @@
 from .gemini import GeminiAPI
-from llm_model_pull import OllamaRunner
+from .ollama import OllamaRunner
 class AI_Factory:
     def __init__(self, api_keys:dict):
         """

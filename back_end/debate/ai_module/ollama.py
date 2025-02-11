@@ -21,7 +21,7 @@ class OllamaRunner:
     def pull_model(self):
         """모델이 없으면 다운로드 (URL에서 가져와서 설치)"""
         if self.model_installed or self.is_model_installed():  
-            print(f"✅ '{self.model_name}' 모델이 이미 설치됨.")
+#            print(f"✅ '{self.model_name}' 모델이 이미 설치됨.")
             self.model_installed = True
             return True
 
@@ -73,7 +73,7 @@ class OllamaRunner:
 
             return generated_text.strip()
         
-    def generate_text_with_vectorstore(self, user_prompt: str, vectorstore, k: int = 3, max_tokens: int = 200) -> str:
+    def generate_text_with_vectorstore(self, user_prompt: str, vectorstore, k: int = 3, max_tokens: int = 100) -> str:
         """
         벡터스토어에서 관련 컨텍스트를 검색한 후, 이를 포함하여 Ollama 모델로 답변을 생성합니다.
         

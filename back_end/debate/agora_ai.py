@@ -11,11 +11,11 @@ class Agora_AI:
 
     def set_role(self, role):
         if role == "judge":
-            role = "판사 프롬프트"
+            role = "Judge side of the topic"
         elif role == "pos":
-            role = "주제에 대하여 찬성하라는 프롬프트"
+            role = "Positive side of the topic"
         elif role == "neg":
-            role = "주제에 대하여 반대하라는 프롬프트"
+            role = "Negative side of the topic"
         if self.ai_type == "GEMINI":
             self.ai_instance.set_role(role)
 
