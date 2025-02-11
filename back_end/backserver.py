@@ -59,7 +59,8 @@ def get_debate_status(id:str):
 
 # 토론 진행 API
 @app.post("/debate/progress")
-def progress_debate(id:str):
+def progress_debate(id:str= Form(...),
+                    message:str=Form(...)):
     if debateManager.debatepool[id].debate["status"]["type"] == "end":
         return {"message": "토론이 이미 종료되었습니다."}
     

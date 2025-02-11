@@ -1,0 +1,16 @@
+{% extends 'layout/body.html' %}
+
+{% block title %} Home {% endblock %}
+
+
+{% block content %}
+    <div class="content-container">
+        <a href="{{ url_for('lobby') }}">
+            <img src="{{ url_for('static', path='img/temp_placeholder_1200x400_orange.png') }}" alt="go to debate lobby" width="1200" height="400">
+        </a>
+        
+        <a href="{{ url_for('history') }}">
+            <img src="{{ url_for('static', path='img/temp_placeholder_1200x400_lime.png') }}" alt="go to history" width="1200" height="400">
+        </a>
+    </div>
+{% endblock %}

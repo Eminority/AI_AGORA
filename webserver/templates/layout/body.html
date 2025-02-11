@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="ko">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>{% block title %}My Website{% endblock %}</title>
+        <link rel="stylesheet" href="{{ url_for('static', path='style/main.css') }}">
+    </head>
+    <body>
+        {% include 'layout/header.html' %}  <!-- 헤더 포함 -->
+
+        <main>
+            {% block content %}{% endblock %}  <!-- 페이지별 콘텐츠 -->
+        </main>
+
+        {% include 'layout/footer.html' %}  <!-- 푸터 포함 -->
+    </body>
+</html>

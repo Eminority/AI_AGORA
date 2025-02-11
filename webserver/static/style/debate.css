@@ -1,0 +1,212 @@
+* {
+  box-sizing: border-box;
+}
+body {
+  font-size: 14px;
+}
+.v4_4161 {
+  width: 854px;
+  height: 666px;
+  background: rgba(255,255,255,1);
+  opacity: 1;
+  position: relative;
+  top: 0px;
+  left: 0px;
+  border-top-left-radius: 28px;
+  border-top-right-radius: 28px;
+  border-bottom-left-radius: 28px;
+  border-bottom-right-radius: 28px;
+  overflow: hidden;
+}
+.name {
+  color: #fff;
+}
+.v4_4163 {
+  width: 854px;
+  height: 320px;
+  background: rgba(255,255,255,1);
+  padding: 8px 24px;
+  margin: 4px;
+  opacity: 1;
+  position: absolute;
+  top: 56px;
+  left: 0px;
+  overflow: hidden;
+}
+.v4_4164 {
+  width: 224px;
+  height: 246px;
+  background: rgba(236,230,240,1);
+  padding: 12px 12px;
+  margin: 6px;
+  opacity: 1;
+  position: absolute;
+  top: 18px;
+  left: 228px;
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
+  border-bottom-left-radius: 12px;
+  border-bottom-right-radius: 12px;
+  overflow: hidden;
+}
+.v4_4165 {
+  width: 200px;
+  height: 176px;
+  background: url("../images/v4_4165.png");
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: cover;
+  opacity: 1;
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+  border-bottom-left-radius: 8px;
+  border-bottom-right-radius: 8px;
+  overflow: hidden;
+}
+.v4_4166 {
+  width: 200px;
+  height: 40px;
+  background: url("../images/v4_4166.png");
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: cover;
+  opacity: 1;
+  position: absolute;
+  top: 194px;
+  left: 12px;
+  overflow: hidden;
+}
+.v4_4167 {
+  width: 200px;
+  color: rgba(29,27,32,1);
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  font-family: Roboto;
+  font-weight: Regular;
+  font-size: 14px;
+  opacity: 1;
+  text-align: left;
+}
+.v4_4168 {
+  width: 200px;
+  color: rgba(73,69,79,1);
+  position: absolute;
+  top: 20px;
+  left: 0px;
+  font-family: Roboto;
+  font-weight: Regular;
+  font-size: 14px;
+  opacity: 1;
+  text-align: left;
+}
+.v4_4169 {
+  width: 206px;
+  height: 44px;
+  background: rgba(98,91,113,1);
+  padding: 8px 16px;
+  opacity: 1;
+  position: absolute;
+  top: 268px;
+  left: 210px;
+  border-top-left-radius: 20px;
+  border-top-right-radius: 20px;
+  border-bottom-left-radius: 20px;
+  border-bottom-right-radius: 8px;
+  overflow: hidden;
+}
+.v4_4170 {
+  width: 174px;
+  color: rgba(255,255,255,1);
+  position: absolute;
+  top: 10px;
+  left: 16px;
+  font-family: Roboto;
+  font-weight: Regular;
+  font-size: 16px;
+  opacity: 1;
+  text-align: left;
+}
+.v4_4171 {
+  width: 854px;
+  height: 60px;
+  background: rgba(255,255,255,1);
+  padding: 8px 24px;
+  margin: 8px;
+  opacity: 1;
+  position: absolute;
+  top: 376px;
+  left: 0px;
+  overflow: hidden;
+}
+.v4_4172 {
+  width: 36px;
+  height: 36px;
+  background: url("../images/v4_4172.png");
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: cover;
+  opacity: 1;
+  position: absolute;
+  top: 12px;
+  left: 24px;
+  border-top-left-radius: 1000px;
+  border-top-right-radius: 1000px;
+  border-bottom-left-radius: 1000px;
+  border-bottom-right-radius: 1000px;
+  overflow: hidden;
+}
+.v4_4173 {
+  width: 178px;
+  height: 44px;
+  background: rgba(236,230,240,1);
+  padding: 8px 16px;
+  opacity: 1;
+  position: absolute;
+  top: 8px;
+  left: 68px;
+  border-top-left-radius: 20px;
+  border-top-right-radius: 20px;
+  border-bottom-left-radius: 8px;
+  border-bottom-right-radius: 20px;
+  overflow: hidden;
+}
+.v4_4174 {
+  width: 146px;
+  color: rgba(73,69,79,1);
+  position: absolute;
+  top: 10px;
+  left: 16px;
+  font-family: Roboto;
+  font-weight: Regular;
+  font-size: 16px;
+  opacity: 1;
+  text-align: left;
+}
+.v4_4182 {
+  width: 854px;
+  height: 80px;
+  background: url("../images/v4_4182.png");
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: cover;
+  padding: 12px 24px;
+  margin: 16px;
+  opacity: 1;
+  position: absolute;
+  top: 436px;
+  left: 0px;
+  overflow: hidden;
+}
+.name {
+  color: #fff;
+}
+.name {
+  color: #fff;
+}
+.name {
+  color: #fff;
+}
