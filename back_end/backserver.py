@@ -55,3 +55,7 @@ def progress_debate(id:str):
         return {"message": "토론이 이미 종료되었습니다."}
     
     return {"progress": debateManager.debatepool[id].progress()}
+
+
+##실행코드
+# uvicorn backserver:app --host 0.0.0.0 port 8000 --reload
