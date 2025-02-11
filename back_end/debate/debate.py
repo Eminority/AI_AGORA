@@ -4,19 +4,18 @@ from datetime import datetime
 from db_module import MongoDBConnection
 from .participants import ParticipantFactory
 from .agora_ai import Agora_AI
+from vectorstore_module import VectorStoreHandler
 
 class Debate:
-    def __init__(self, participant_factory: ParticipantFactory = None, db_connection: MongoDBConnection = None, vector_handler=None):
+    def __init__(self, participant_factory: ParticipantFactory, db_connection: MongoDBConnection):
         self.judge = None
         self.pos = None
         self.neg = None
         self.db_connection = db_connection
         self.participant_factory = participant_factory
-        self.vector_handler = vector_handler
 
         # debate 필드 초기화
         self.debate = {
-            "_id": None,
             "participants": None,
             "topic": None,
             "status": {
@@ -42,7 +41,7 @@ class Debate:
     def set_judge(self):
         """판사 역할의 AI 인스턴스 생성 및 역할 설정"""
         gemini_instance = self.participant_factory.ai_factory.create_ai_instance("GEMINI")
-        self.judge = Agora_AI(ai_type="GEMINI", ai_instance=gemini_instance, vector_handler=self.vector_handler)
+        self.judge = Agora_AI(ai_type="GEMINI", ai_instance=gemini_instance, vector_handler=self.participant_factory.vector_handler)
         self.judge.set_role("judge")
 
     def create(self, topic: str, participants: dict):
@@ -50,7 +49,7 @@ class Debate:
         토론 생성: 새로운 토론(_id, topic, participants 등) 정보를 세팅하고
         DB에 저장한 뒤, 판사와 참가자들을 준비합니다.
         """
-        if self.debate["_id"] is not None or not participants:
+        if self.debate.get("_id") is not None or not participants:
             return False
 
         self.debate["topic"] = topic
@@ -65,7 +64,8 @@ class Debate:
         self.debate["_id"] = str(uuid.uuid4())
 
         # DB에 삽입 후 실제 _id(또는 ObjectId) 값을 debate dict에 반영
-        debate_id = self.db_connection.insert_data("debate", self.debate)
+        print(self.debate)
+        debate_id = self.db_connection.insert_data("debate",self.debate)
         self.debate["_id"] = debate_id
 
         # 참가자 생성 (pos, neg)

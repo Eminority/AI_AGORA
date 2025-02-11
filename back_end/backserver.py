@@ -35,7 +35,7 @@ participant_factory = ParticipantFactory(vector_handler, ai_factory)
 app = FastAPI()
 
 #토론 관리 인스턴스 생성
-debateManager = DebateManager(participant_factory=participant_factory, db_connection=db_connection, vector_handler=None)
+debateManager = DebateManager(participant_factory=participant_factory, db_connection=db_connection)
 
 # 토론 생성 API
 @app.post("/debate")
