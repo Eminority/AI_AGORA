@@ -6,6 +6,10 @@ spacy
 wikipedia
 opencv-python
 webdriver_manager
+lnagchain
+langchain_community
+lnagchain-ollama
+google.generativeai
 
-
-
+tf-keras
+faiss-cpu
