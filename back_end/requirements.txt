@@ -7,3 +7,6 @@ sentence-transformers
 rank-bm25
 langchain-community
 langchain-huggingface
+fastapi
+uvicorn
+ollama
