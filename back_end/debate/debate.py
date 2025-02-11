@@ -113,49 +113,49 @@ class Debate:
             # (필요시 토론 준비 작업)
             self.ready_to_debate()
             result["speaker"] = "judge"
-            result["message"] = self.judge.generate_text("System:judge\nContext:topic\nUser:Tell me about the gist of the argument")
+            result["message"] = self.judge.generate_text(f"System:judge\nTopic: {self.debate['topic']}\nUser:Briefly explain the topic and tell me to start arguing for it.")
 
         elif step == 2:
             # 2. 찬성측 주장
             result["speaker"] = "pos"
-            result["message"] = self.pos.answer("System:positive\nContext:Comments in favor of the topic\nUser:tell me your opinion on the topic, including supporting evidence.")
+            result["message"] = self.pos.answer(f"Last statement: {self.debate['debate_log'][-1]} System: Positive feedback\nContext: Comments supporting the topic\nUser: Please provide your opinion on the topic, including supporting evidence.")
 
         elif step == 3:
             # 3. 반대측 주장
             result["speaker"] = "neg"
-            result["message"] = self.neg.answer("반대측 주장 발언 프롬프트")
+            result["message"] = self.neg.answer(f"Last statement : {self.debate['debate_log'][-2]}System: Negative feedback\nContext: Comments opposing the topic\nUser: Please share your opinion on the topic, including counterarguments.")
 
         elif step == 4:
             # 4. 판사가 변론 준비시간 1초 제공
             result["speaker"] = "judge"
-            result["message"] = "변론 준비 시간 1초를 갖겠습니다."
+            result["message"] = "You will have 1 second to prepare your argument."
             time.sleep(1)
 
         elif step == 5:
             # 5. 반대측 변론
             result["speaker"] = "neg"
-            result["message"] = self.neg.answer("반대측 변론 프롬프트")
+            result["message"] = self.neg.answer(f"Last statement : {self.debate['debate_log'][-3]}\nSystem: Negative argument\nContext: Comments opposing the argument\nUser: Please present your counterargument.")
 
         elif step == 6:
             # 6. 찬성측 변론
             result["speaker"] = "pos"
-            result["message"] = self.pos.answer("찬성측 변론 프롬프트")
+            result["message"] = self.pos.answer(f"Last statement : {self.debate['debate_log'][-3]}System: Positive argument\nContext: Comments supporting the argument\nUser: Please present your supporting argument.")
 
         elif step == 7:
             # 7. 판사가 최종 주장 시간(1초) 부여
             result["speaker"] = "judge"
-            result["message"] = "최종 주장 준비 시간 1초를 갖겠습니다."
+            result["message"] = "You will have 1 second to prepare your final argument."
             time.sleep(1)
 
         elif step == 8:
             # 8. 찬성측 최종 결론
             result["speaker"] = "pos"
-            result["message"] = self.pos.answer("찬성측 최종 결론 프롬프트")
+            result["message"] = self.pos.answer(f"Last statement : {self.debate['debate_log'][:-2]}System: Positive final conclusion\nContext: Comments supporting the final conclusion\nUser: Please present your final supporting conclusion.")
 
         elif step == 9:
             # 9. 반대측 최종 결론
             result["speaker"] = "neg"
-            result["message"] = self.neg.answer("반대측 최종 결론 프롬프트")
+            result["message"] = self.neg.answer(f"Last statement : {self.debate['debate_log'][:-3]}System: Negative final conclusion\nContext: Comments supporting the final conclusion\nUser: Please present your final supporting conclusion.")
 
         elif step == 10:
             # 10. 판사가 판결 준비시간(1초) 부여
@@ -174,6 +174,8 @@ class Debate:
             # 1~11 범위를 벗어난 경우
             result["speaker"] = "SYSTEM"
             result["message"] = "이미 모든 토론 단계가 종료되었습니다."
+        
+        self.debate["debate_log"].append(result["message"])
 
         # 로그에 기록
         debate["debate_log"].append(result)
@@ -191,14 +193,16 @@ class Debate:
         topic = self.debate["topic"]
         if self.pos and hasattr(self.pos, 'agora_ai'):
             self.pos.agora_ai.crawling(topic)
+            self.pos.agora_ai.set_role(f"Prompt affirming the topic of {topic}")
         if self.neg and hasattr(self.neg, 'agora_ai'):
             self.neg.agora_ai.crawling(topic)
+            self.neg.agora_ai.set_role(f"Prompt negating the topic of {topic}")
         if self.judge:
             self.judge.crawling(topic)
 
     def evaluate(self):
         """판사가 최종 판결문(결론)을 생성하고, 토론 내용을 요약"""
-        self.debate["result"] = self.judge.generate_text("판사의 최종 판결문 요청 프롬프트")
+        self.debate["result"] = self.judge.generate_text(f"Statement: {self.debate['debate_log']} Judge's final verdict: First, explain the reason for the winner. Then, provide the final ruling: either 'positive' or 'negative'.")
         self.summarize()
         return self.debate["result"]
 

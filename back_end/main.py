@@ -35,7 +35,7 @@ if __name__ == "__main__":
     #주제를 후에 입력받는다고 가정하고 작성.
     #토론 인스턴스 만들기
     participant_factory = ParticipantFactory(vector_handler,ai_factory)
-    debate = Debate(participant_factory=participant_factory, db_connection=db_connection, vector_handler=None )
+    debate = Debate(participant_factory=participant_factory, db_connection=db_connection)
 
     ###############################임시로 입력받는 테스트 코드
 
