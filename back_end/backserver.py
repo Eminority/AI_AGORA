@@ -58,4 +58,4 @@ def progress_debate(id:str):
 
 
 ##실행코드
-# uvicorn backserver:app --host 0.0.0.0 port 8000 --reload
+# uvicorn backserver:app --host 0.0.0.0 -port 8000 --reload
