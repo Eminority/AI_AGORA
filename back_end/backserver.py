@@ -56,6 +56,12 @@ def progress_debate(id:str):
     
     return {"progress": debateManager.debatepool[id].progress()}
 
+@app.get("debate/list")
+def get_debate_list():
+    debatelist = {}
+    for id in debateManager.debatepool.keys():
+        debatelist[id] = debateManager.debatepool[id]["debate"]["topic"]
+    return debatelist
 
 ##실행코드
 # uvicorn backserver:app --host 0.0.0.0 --port 8000 --reload
