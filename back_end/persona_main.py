@@ -39,11 +39,10 @@ if __name__ == "__main__":
     
 
     # 🔍 객체 성격 분석 실행 (DB 저장 포함)
-    result = persona_detector.get_traits(object_name)
+    persona_detector.get_traits(object_name)
 
-    # 🔹 결과 출력
-    print("\n✅ 분석 결과:")
-    print(json.dumps(result, indent=4, ensure_ascii=False))
+    # ✅ 터미널 출력 없이 DB에만 저장
+    print("✅ 프로필이 DB에 저장되었습니다.")  # 🔹 확인 메시지만 출력
 
     # ✅ 연결 종료
     db_connection.close_connection()

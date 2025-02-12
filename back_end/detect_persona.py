@@ -4,7 +4,7 @@ from langchain_ollama import ChatOllama  # ✅ 최신 패키지로 변경
 from langchain.prompts import PromptTemplate
 import google.generativeai as genai
 from bson import ObjectId
-# from db_module import MongoDBConnection
+from langchain_core.messages import AIMessage
 
 class DetectPersona:
     """
@@ -119,7 +119,7 @@ class DetectPersona:
         # 🔍 성격 분석 (Local LLM 또는 GEMINI)
         prompt_template = PromptTemplate(
             input_variables=["object_name", "context"],
-            template="Based on the following information, describe the personality traits of {object_name} in under only 300 words: {context}"
+            template="Based on the following information, describe the personality traits of {object_name} in only 2 sentence words: {context}"
         )
         final_prompt = prompt_template.format(object_name=object_name, context=context)
 
@@ -138,15 +138,18 @@ class DetectPersona:
     def save_to_db(self, name, attributes):
         """
         분석된 객체 정보를 DB에 저장.
+        - AIMessage 같은 LangChain 객체를 직접 저장하지 않고, content(텍스트)만 저장
         """
+        if isinstance(attributes, AIMessage):
+            attributes = attributes.content  # 🔹 AIMessage 객체에서 content(텍스트)만 추출
+
         new_profile = {
             "name": name,
-            "object_attribute": attributes,
-            "create_time": datetime.datetime.utcnow().isoformat()  # ✅ JSON 직렬화 가능하도록 변환
+            "object_attribute": attributes,  # 이제 문자열 형태로 저장됨
+            "create_time": datetime.datetime.utcnow()
         }
 
         profile_id = self.db.insert_data("object", new_profile)
-        new_profile["_id"] = str(profile_id)  # ✅ ObjectId를 문자열로 변환
-
         print(f"✅ 새 프로필이 생성되었습니다! (ID: {profile_id})")
         return new_profile
+
