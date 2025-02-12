@@ -27,8 +27,10 @@ class DetectPersona:
             genai.configure(api_key=AI_API_KEY)
             self.gemini_model = genai.GenerativeModel('gemini-pro')
 
-    def select_source(self):
-        """ 검색 소스를 선택 (Wikipedia 또는 GEMINI) """
+    def select_source_and_model(self):
+        """ 검색 소스(Wikipedia/GEMINI) 및 성격 분석 모델(Local/GEMINI) 선택 """
+
+        # 🔹 검색 소스 선택
         while True:
             print("\n📌 사용할 검색 소스를 선택하세요:")
             print("[1] Wikipedia 기반 검색")
@@ -49,8 +51,7 @@ class DetectPersona:
 
         print(f"✅ 검색 소스가 '{self.source}'로 설정되었습니다.")
 
-    def select_model(self):
-        """ 성격 분석을 수행할 모델 선택 (Local LLM 또는 GEMINI) """
+        # 🔹 성격 분석 모델 선택
         while True:
             print("\n📌 성격 분석을 수행할 모델을 선택하세요:")
             print("[1] Local 모델 사용")
@@ -63,7 +64,7 @@ class DetectPersona:
             elif choice == "2":
                 if self.gemini_model is None:
                     print("❌ GEMINI API가 설정되지 않았습니다. Local 모델을 사용하세요.")
-                    continue
+                    continue  # 다시 선택하게 함
                 print("✅ GEMINI를 사용하여 성격 분석을 수행합니다.")
                 break
             else:
@@ -118,7 +119,7 @@ class DetectPersona:
         # 🔍 성격 분석 (Local LLM 또는 GEMINI)
         prompt_template = PromptTemplate(
             input_variables=["object_name", "context"],
-            template="Based on the following information, describe the personality traits of {object_name} in under 300 words: {context}"
+            template="Based on the following information, describe the personality traits of {object_name} in under only 300 words: {context}"
         )
         final_prompt = prompt_template.format(object_name=object_name, context=context)
 

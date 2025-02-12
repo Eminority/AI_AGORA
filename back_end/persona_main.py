@@ -35,8 +35,8 @@ if __name__ == "__main__":
     object_name = input("🔍 분석할 객체 이름을 입력하세요: ").strip()
 
     # 🔹 검색 및 성격 분석 모델 설정
-    persona_detector.select_source()
-    persona_detector.select_model()
+    persona_detector.select_source_and_model()
+    
 
     # 🔍 객체 성격 분석 실행 (DB 저장 포함)
     result = persona_detector.get_traits(object_name)
