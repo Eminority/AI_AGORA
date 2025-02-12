@@ -1,15 +1,17 @@
 requests
 beautifulsoup4
 selenium
-git+https://github.com/MarioVilas/googlesearch.git
+# git+https://github.com/MarioVilas/googlesearch.git
 spacy
 wikipedia
 opencv-python
 webdriver_manager
-lnagchain
+langchain
 langchain_community
-lnagchain-ollama
+langchain-ollama
 google.generativeai
+os
+datetime
 
 tf-keras
 faiss-cpu
