@@ -1,7 +1,6 @@
 import json
 import requests
 import subprocess
-import ollama
 
 class OllamaRunner:
     def __init__(self, base_url="http://localhost:11434"):
