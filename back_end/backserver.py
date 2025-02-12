@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Form, Query
+from fastapi import FastAPI, Form, Query, File, UploadFile
 import os
 import json
 from dotenv import load_dotenv
@@ -7,7 +7,7 @@ from debate.debate_manager import DebateManager
 from debate.participants import ParticipantFactory
 from db_module import MongoDBConnection
 from vectorstore_module import VectorStoreHandler
-
+from ai_profile.ai_profile import ProfileManager
 
 # 환경 변수 로드
 load_dotenv()
@@ -34,6 +34,10 @@ participant_factory = ParticipantFactory(vector_handler, ai_factory)
 
 # FastAPI 앱 생성
 app = FastAPI()
+
+
+#프로필 관리 객체 생성성
+profile_manager = ProfileManager(db=db_connection)
 
 #토론 관리 인스턴스 생성
 debateManager = DebateManager(participant_factory=participant_factory, db_connection=db_connection)
@@ -82,6 +86,32 @@ def get_debate_list():
     for id in debateManager.debatepool.keys():
         debatelist[id] = debateManager.debatepool[id]["debate"]["topic"]
     return debatelist
+
+##이미 생성되어있는 사물 프로필 목록 반환
+@app.get("/profile/list")
+def get_ai_list():
+    # id - data 형태로 묶어서 데이터 전송
+    return {id : profile_manager.objectlist[id] for id in profile_manager.objectlist.keys()}
+
+
+##yolo로 이미지 판단해서 list 반환하기
+@app.post("/profile/objectdetect")
+def object_detect(file: UploadFile = File(...)):
+    ## YOLO 로직 처리
+    #로직처리한 결과로 바꿔줄 것
+    return {"object":["bicycle", "apple"]} 
+
+
+
+#최종적으로 이미지 포함 프로필 만들기
+@app.get("/profile/create")
+def create_ai_profile(name:str=Form(...),
+                      img:str=Form(...),
+                      ai:str=Form(...)):
+    new_id = profile_manager.create_profile(name=name,
+                                   img=img,
+                                   ai=ai)
+    return {"result":"success"}
 
 ##실행코드
 # uvicorn backserver:app --host 0.0.0.0 --port 8000 --reload

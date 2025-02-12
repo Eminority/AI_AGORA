@@ -1,12 +1,12 @@
 ## ai 프로필을 만들어서 저장하고 불러올 수 있게끔 하는 모듈
 from db_module import MongoDBConnection
-
+from datetime import datetime
 class ProfileManager:
     def __init__(self, db: MongoDBConnection):
-        data = db.select_data_from_query(collection_name="object")
+        data = db.select_data_from_query(collection_name="object", query={})
         self.objectlist = {}
         for raw_object in data:
-            obj = Profile(_id               = raw_object.get("_id"),
+            profile = Profile(_id           = str(raw_object.get("_id")),
                           name              = raw_object.get("name"),
                           img               = raw_object.get("img"),
                           ai                = raw_object.get("ai"),
@@ -14,21 +14,21 @@ class ProfileManager:
                           object_attribute  = raw_object.get("object_attribute"),
                           debate_history    = raw_object.get("debate_history", [])
                           )
-            self.objectlist[obj._id] = obj
-    
+            if str(raw_object.get("_id")):
+                self.objectlist[profile.data["_id"]] = profile
+
     def create_profile(self,
                         name:str=None,
                         img:str=None,
-                        ai:str=None,
-                        create_date:str=None,
-                        object_attribute:str=None):
+                        ai:str=None):
         new_obj = Profile(name=name,
                             img=img,
                             ai=ai,
-                            create_date=create_date,
-                            object_attribute=object_attribute)
+                            create_date=datetime.now()
+                            )
         new_obj.save(self.db)
         self.objectlist[new_obj.data["_id"]] = new_obj
+        return new_obj.data["_id"]
 
     
 class Profile:
