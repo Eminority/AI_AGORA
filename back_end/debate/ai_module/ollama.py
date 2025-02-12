@@ -12,7 +12,6 @@ class OllamaRunner:
         """🔹 동적으로 모델을 설정"""
         self.model_name = model_name
         self.model_installed = False  # 모델 다운로드 상태를 추적하는 변수
-# >>>>>>> 8b3817f9de447aa3e09ec5f8027fb3790ec39d4d:back_end/debate/ai_module/ollama.py
 
     def is_model_installed(self):
         """현재 설치된 Ollama 모델 목록을 확인하여 해당 모델이 있는지 검사"""
@@ -24,7 +23,7 @@ class OllamaRunner:
             result = subprocess.run(["ollama", "list"], capture_output=True, text=True)
             return self.model_name in result.stdout
         except FileNotFoundError:
-            print("❌ Ollama가 설치되지 않았거나 실행할 수 없습니다.")
+            print("❌ 모델이 설치되지 않았거나 실행할 수 없습니다.")
             return False
 
     def pull_model(self):
