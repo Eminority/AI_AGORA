@@ -12,7 +12,7 @@ document.addEventListener("DOMContentLoaded", function(){
         formData.append("file", fileInput.files[0]);
 
         // 서버에 이미지 업로드 요청
-        const response = await fetch("{{ request.url_for('list_from_object_detect') }}", {
+        const response = await fetch(document.getElementById("yoloDetectForm").getAttribute("data-object-detect-url"), {
             method: "POST",
             body: formData
         });
@@ -22,12 +22,16 @@ document.addEventListener("DOMContentLoaded", function(){
 
         // 서버에서 받은 list 데이터를 기반으로 radio 버튼 생성
         generateRadioButtons(result.object);
+
+        if (result.result){
+            document.getElementById("generateAI_area").style.display = "block";
+        }
     });
 
     function generateRadioButtons(options) {
         const container = document.getElementById("detected-list");
         container.innerHTML = "";  // 기존 내용 초기화
-
+        console.log(options)
         if (!options.length) {
             container.innerHTML = "<p>감지된 객체가 없습니다.</p>";
             return;

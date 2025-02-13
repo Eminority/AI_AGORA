@@ -29,3 +29,4 @@ app.include_router(history.router)
 
 # 실행 코드
 # uvicorn webserver:app --host 0.0.0.0 --port 8001 --reload
+# .env 안에 DEBATE_SERVER="http://127.0.0.1:8000" 넣기

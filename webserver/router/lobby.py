@@ -25,12 +25,11 @@ async def lobby_create_debate(request:Request):
 
 
 @router.post("/lobby/objectdetect")
-async def list_from_object_detect(request:Request, original_image: UploadFile = File(...)):
+async def list_from_object_detect(original_image: UploadFile = File(...)):
     url = f"{config.debate_server_uri}/profile/objectdetect"
-    response = request.post(
-        url, files = {"file":(original_image.filename, original_image.file, original_image.content_type)}
-    )
-    return response.json()
+    with httpx.Client() as client:
+        response = client.post(url=url, data=original_image)
+    return #response.json()
 
 @router.post("/lobby/createprofile")
 async def create_profile(request:Request, file: UploadFile = File(...)):
