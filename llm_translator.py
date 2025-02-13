@@ -1,4 +1,5 @@
 import subprocess
+import json
 
 class OllamaTranslator:
     """
@@ -29,7 +30,7 @@ class OllamaTranslator:
         """
         self.model = model_name
 
-    def translate(self, text, target_language="ko"):
+    def translate(self, text, target_language):
         """
         Ollama를 사용하여 텍스트를 번역.
 
@@ -45,6 +46,30 @@ class OllamaTranslator:
             return result.stdout.strip() if result.stdout else "⚠️ 번역된 내용이 없습니다."
         except Exception as e:
             return f"⚠️ 예외 발생: {e}"
+        
+    def translate_json(self, json_file, target_lang="ko"):
+        """
+        JSON 파일을 읽어와 번역하는 메서드.
+        
+        :param json_file: 번역할 JSON 파일 경로
+        :param target_lang: 번역할 언어 코드
+        :return: 번역된 JSON 데이터
+        """
+        try:
+            with open(json_file, "r", encoding="utf-8") as file:
+                data = json.load(file)
+
+            translated_data = {
+                "topic": self.translate(data.get("topic", ""), target_lang),
+                "summary": self.translate(data.get("summary", ""), target_lang),
+                "pro_argument": self.translate(data.get("pros", ""), target_lang),
+                "con_argument": self.translate(data.get("cons", ""), target_lang),
+            }
+
+            return translated_data
+        except Exception as e:
+            print(f"❌ JSON 번역 오류: {e}")
+            return None
 
 # ✅ 실행 예제
 if __name__ == "__main__":
