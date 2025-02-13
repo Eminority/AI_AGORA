@@ -10,7 +10,7 @@ class ProfileManager:
                           name              = raw_object.get("name"),
                           img               = raw_object.get("img"),
                           ai                = raw_object.get("ai"),
-                          create_date       = raw_object.get("create_date"),
+                          create_time       = raw_object.get("create_time"),
                           object_attribute  = raw_object.get("object_attribute"),
                           debate_history    = raw_object.get("debate_history", [])
                           )
@@ -24,7 +24,7 @@ class ProfileManager:
         new_obj = Profile(name=name,
                             img=img,
                             ai=ai,
-                            create_date=datetime.now()
+                            create_time=datetime.now()
                             )
         new_obj.save(self.db)
         self.objectlist[new_obj.data["_id"]] = new_obj
@@ -36,14 +36,14 @@ class Profile:
                         name:str=None,
                         img:str=None,
                         ai:str=None,
-                        create_date:str=None,
+                        create_time:str=None,
                         object_attribute:str=None,
                         debate_history:list=[]):
         self.data = {}
         self.data["name"]           = name
         self.data["img"]            = img
         self.data["ai"]             = ai
-        self.data["create_date"]    = create_date
+        self.data["create_time"]    = create_time
         self.data["object_attribute"] = object_attribute
         self.data["debate_history"] = debate_history
         if _id: # id가 None으로라도 들어가있으면 에러 내니까 None이면 아예 안만들기
