@@ -8,6 +8,7 @@ from db_module import MongoDBConnection
 from vectorstore_module import VectorStoreHandler  # 벡터스토어 관련 모듈
 from detect_persona import DetectPersona
 from debate.ai_module.ai_factory import AI_Factory
+import time
 
 if __name__ == "__main__":
 
@@ -37,12 +38,13 @@ if __name__ == "__main__":
     # 🔹 검색 및 성격 분석 모델 설정
     persona_detector.select_source_and_model()
     
-
+    time_1 = time.time()
     # 🔍 객체 성격 분석 실행 (DB 저장 포함)
     persona_detector.get_traits(object_name)
 
     # ✅ 터미널 출력 없이 DB에만 저장
     print("✅ 프로필이 DB에 저장되었습니다.")  # 🔹 확인 메시지만 출력
-
+    time_2 = time.time()
+    print(f"spended time {time_2 - time_1}")
     # ✅ 연결 종료
     db_connection.close_connection()
