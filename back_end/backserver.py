@@ -50,9 +50,9 @@ def create_debate(pos_id: str = Form(...),
     pos = db_connection.select_data_from_id("object", pos_id)
     neg = db_connection.select_data_from_id("object", neg_id)
 
-    # debate_manager 수정되면 끼우기
+    id = debateManager.create_debate(pos, neg, topic)
 
-    return #{"message": "토론이 생성되었습니다.", "topic": topic, "id":debate_id}
+    return {"message": "토론이 생성되었습니다.", "topic": topic, "id":id}
 
 # 토론 상태 확인 API
 @app.get("/debate/status")
