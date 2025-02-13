@@ -5,6 +5,7 @@ from db_module import MongoDBConnection
 from .participants import ParticipantFactory
 from .agora_ai import Agora_AI
 from vectorstore_module import VectorStoreHandler
+import re
 
 class Debate:
     def __init__(self, participant_factory: ParticipantFactory, db_connection: MongoDBConnection):
@@ -266,13 +267,10 @@ class Debate:
             "Please conclude your answer with the final score in the following format: 'Final Score - Pro: X'."
         )
 
-        # Extract the Pro score from the result text using a regular expression
-        import re
         match = re.search(r'Final Score\s*-\s*Pro:\s*(\d+)', result_text)
         
         if match:
             pro_score = int(match.group(1))
-            # Determine the result based on the pro score
             if pro_score > 50:
                 self.debate["result"] = "pos"
             elif pro_score < 50:
@@ -280,7 +278,6 @@ class Debate:
             else:
                 self.debate["result"] = "draw"
         else:
-            # Fallback in case the expected format is not found
             self.debate["result"] = "draw"
             
         return self.debate["result"]
