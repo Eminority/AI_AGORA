@@ -42,7 +42,7 @@ class Debate:
         """판사 역할의 AI 인스턴스 생성 및 역할 설정"""
         gemini_instance = self.participant_factory.ai_factory.create_ai_instance("GEMINI")
         self.judge = Agora_AI(ai_type="GEMINI", ai_instance=gemini_instance, vector_handler=self.participant_factory.vector_handler)
-        self.judge.set_role("judge")
+#        self.judge.set_role("judge")
 
     def create(self, topic: str, participants: dict):
         """
@@ -234,14 +234,11 @@ class Debate:
             if self.pos and hasattr(self.pos, 'agora_ai'):
                 self.pos.agora_ai.crawled_data = shared_crawled_data
                 self.pos.agora_ai.vectorstore = shared_vectorstore
-                self.pos.agora_ai.set_role(f"Prompt affirming the topic of {topic}")
 
             # NEG 공유
             if self.neg and hasattr(self.neg, 'agora_ai'):
                 self.neg.agora_ai.crawled_data = shared_crawled_data
                 self.neg.agora_ai.vectorstore = shared_vectorstore
-                self.neg.agora_ai.set_role(f"Prompt negating the topic of {topic}")
-
             # JUDGE 공유
             if self.judge:
                 if hasattr(self.judge, 'agora_ai'):
