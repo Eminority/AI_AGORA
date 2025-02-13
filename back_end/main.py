@@ -9,6 +9,8 @@ from vectorstore_module import VectorStoreHandler  # 벡터스토어 관련 모�
 from debate.ai_module.ai_factory import AI_Factory
 from debate.participants import ParticipantFactory 
 from debate.debate import Debate
+from debate.debate_manager import DebateManager
+
 
 if __name__ == "__main__":
 
@@ -35,19 +37,22 @@ if __name__ == "__main__":
     #주제를 후에 입력받는다고 가정하고 작성.
     #토론 인스턴스 만들기
     participant_factory = ParticipantFactory(vector_handler,ai_factory)
-    debate = Debate(participant_factory=participant_factory, db_connection=db_connection, vector_handler=None )
-
+    debate = Debate(participant_factory=participant_factory, db_connection=db_connection)
+    debate_manager = DebateManager(participant_factory=participant_factory, db_connection=db_connection)
     ###############################임시로 입력받는 테스트 코드
 
     ####임시 사용자
-    user_name = input("pos 이름 설정 : ")
-    user_id = "temp_id_111111111"
-    user_ai = input("ai 설정 - 현재 가능한 AI : GEMINI // 입력  :")
-    user = {"name"  : user_name,
-            "_id"   : user_id,
-            "ai"    : user_ai,
-            "img" : None
-            }
+    # user_name = input("pos 이름 설정 : ")
+    # user_id = "temp_id_111111111"
+    # user_ai = input("ai 설정 - 현재 가능한 AI : GEMINI // 입력  :")
+    user = {
+        "_id": "67ac1d198f64bb663ade93b3",
+        "name": "clock",
+        "ai" : "GEMINI",
+        "object_attribute": "Out of control, out of control, very angry speach tone",
+        "create_time":  "2025-02-12T04:01:29.651Z",
+        "img":None
+        }
     ####임시 사용자
 
 
@@ -64,12 +69,14 @@ if __name__ == "__main__":
     
     topic = input("주제 입력 : ")
 
-    debate.create(topic, participants)
-    
+
+    debate_manager.create_debate(pos=user, neg=opponent, topic=topic)    
+    debates = debate_manager.debatepool.values()
     ###############################임시로 입력받는 테스트 코드
     
     
     ###############################임시로 실행하는 테스트 코드
-    while debate.debate["status"]["type"] != "end":
-        print (debate.progress())
+    for debate in debates:
+        while debate.debate["status"]["type"] != "end":
+            print (debate.progress())
     ###############################임시로 실행하는 테스트 코드

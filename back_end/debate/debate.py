@@ -42,7 +42,7 @@ class Debate:
         """판사 역할의 AI 인스턴스 생성 및 역할 설정"""
         gemini_instance = self.participant_factory.ai_factory.create_ai_instance("GEMINI")
         self.judge = Agora_AI(ai_type="GEMINI", ai_instance=gemini_instance, vector_handler=self.participant_factory.vector_handler)
-        self.judge.set_role("judge")
+#        self.judge.set_role("judge")
 
     def create(self, topic: str, participants: dict):
         """
@@ -113,49 +113,49 @@ class Debate:
             # (필요시 토론 준비 작업)
             self.ready_to_debate()
             result["speaker"] = "judge"
-            result["message"] = self.judge.generate_text("주제(Topic)에 대한 소개 발언 프롬프트")
+            result["message"] = self.judge.generate_text(f"System:judge\nTopic: {self.debate['topic']}\nUser:Briefly explain the topic and tell me to start arguing for it.")
 
         elif step == 2:
             # 2. 찬성측 주장
             result["speaker"] = "pos"
-            result["message"] = self.pos.answer("찬성측 주장 발언 프롬프트")
+            result["message"] = self.pos.answer(f"Last statement: {self.debate['debate_log'][-1]} System: Positive feedback\nContext: Comments supporting the topic\nUser: Please provide your opinion on the topic, including supporting evidence.")
 
         elif step == 3:
             # 3. 반대측 주장
             result["speaker"] = "neg"
-            result["message"] = self.neg.answer("반대측 주장 발언 프롬프트")
+            result["message"] = self.neg.answer(f"Last statement : {self.debate['debate_log'][-2]}System: Negative feedback\nContext: Comments opposing the topic\nUser: Please share your opinion on the topic, including counterarguments.")
 
         elif step == 4:
             # 4. 판사가 변론 준비시간 1초 제공
             result["speaker"] = "judge"
-            result["message"] = "변론 준비 시간 1초를 갖겠습니다."
+            result["message"] = "You will have 1 second to prepare your argument."
             time.sleep(1)
 
         elif step == 5:
             # 5. 반대측 변론
             result["speaker"] = "neg"
-            result["message"] = self.neg.answer("반대측 변론 프롬프트")
+            result["message"] = self.neg.answer(f"Last statement : {self.debate['debate_log'][-3]}\nSystem: Negative argument\nContext: Comments opposing the argument\nUser: Please present your counterargument.")
 
         elif step == 6:
             # 6. 찬성측 변론
             result["speaker"] = "pos"
-            result["message"] = self.pos.answer("찬성측 변론 프롬프트")
+            result["message"] = self.pos.answer(f"Last statement : {self.debate['debate_log'][-3]}System: Positive argument\nContext: Comments supporting the argument\nUser: Please present your supporting argument.")
 
         elif step == 7:
             # 7. 판사가 최종 주장 시간(1초) 부여
             result["speaker"] = "judge"
-            result["message"] = "최종 주장 준비 시간 1초를 갖겠습니다."
+            result["message"] = "You will have 1 second to prepare your final argument."
             time.sleep(1)
 
         elif step == 8:
             # 8. 찬성측 최종 결론
             result["speaker"] = "pos"
-            result["message"] = self.pos.answer("찬성측 최종 결론 프롬프트")
+            result["message"] = self.pos.answer(f"Last statement : {self.debate['debate_log'][:-2]}System: Positive final conclusion\nContext: Comments supporting the final conclusion\nUser: Please present your final supporting conclusion.")
 
         elif step == 9:
             # 9. 반대측 최종 결론
             result["speaker"] = "neg"
-            result["message"] = self.neg.answer("반대측 최종 결론 프롬프트")
+            result["message"] = self.neg.answer(f"Last statement : {self.debate['debate_log'][:-3]}System: Negative final conclusion\nContext: Comments supporting the final conclusion\nUser: Please present your final supporting conclusion.")
 
         elif step == 10:
             # 10. 판사가 판결 준비시간(1초) 부여
@@ -174,11 +174,13 @@ class Debate:
             # 1~11 범위를 벗어난 경우
             result["speaker"] = "SYSTEM"
             result["message"] = "이미 모든 토론 단계가 종료되었습니다."
+        
+        self.debate["debate_log"].append(result["message"])
 
         # 로그에 기록
         debate["debate_log"].append(result)
         result["timestamp"] = datetime.now()
-        # self.save()
+        self.save()
 
         # 아직 11단계가 아니면 다음 단계로 증가
         if step < self.max_step:
@@ -187,18 +189,71 @@ class Debate:
         return result
 
     def ready_to_debate(self):
-        """참가자와 판사가 토론 주제에 대해 미리 자료 수집/준비를 수행"""
+        """
+        참가자와 판사가 토론 주제에 대해 자료를 수집 및 준비하는 함수.
+        크롤링과 벡터 스토어 생성은 한 번만 수행한 후,
+        그 결과(크롤링 데이터와 벡터스토어)를 모든 참가자에게 공유한다.
+        """
         topic = self.debate["topic"]
+        shared_crawled_data = None
+        shared_vectorstore = None
+
+        # [1] 한 참가자(우선순위: pos → neg → judge)를 통해 크롤링 및 벡터 스토어 생성
         if self.pos and hasattr(self.pos, 'agora_ai'):
+            print("[INFO] POS 측에서 크롤링을 실행합니다.")
             self.pos.agora_ai.crawling(topic)
-        if self.neg and hasattr(self.neg, 'agora_ai'):
+            shared_crawled_data = self.pos.agora_ai.crawled_data
+            shared_vectorstore = self.pos.agora_ai.vectorstore
+
+        elif self.neg and hasattr(self.neg, 'agora_ai'):
+            print("[INFO] NEG 측에서 크롤링을 실행합니다.")
             self.neg.agora_ai.crawling(topic)
-        if self.judge:
-            self.judge.crawling(topic)
+            shared_crawled_data = self.neg.agora_ai.crawled_data
+            shared_vectorstore = self.neg.agora_ai.vectorstore
+
+        elif self.judge:
+            if hasattr(self.judge, 'agora_ai'):
+                print("[INFO] JUDGE 측(agora_ai 있음)에서 크롤링을 실행합니다.")
+                self.judge.agora_ai.crawling(topic)
+                shared_crawled_data = self.judge.agora_ai.crawled_data
+                shared_vectorstore = self.judge.agora_ai.vectorstore
+            else:
+                print("[INFO] JUDGE 측에서 크롤링을 실행합니다.")
+                if hasattr(self.judge, 'crawling'):
+                    self.judge.crawling(topic)
+                # getattr를 사용해 속성이 없으면 None을 기본값으로 사용
+                shared_crawled_data = getattr(self.judge, 'crawled_data', None)
+                shared_vectorstore = getattr(self.judge, 'vectorstore', None)
+        else:
+            print("[ERROR] 크롤링을 수행할 참가자가 없습니다.")
+            return  # 더 이상 진행할 수 없으므로 함수 종료
+
+        # [2] 크롤링 및 벡터 스토어 생성 결과를 모든 참가자에게 공유
+        if shared_crawled_data is not None and shared_vectorstore is not None:
+            # POS 공유
+            if self.pos and hasattr(self.pos, 'agora_ai'):
+                self.pos.agora_ai.crawled_data = shared_crawled_data
+                self.pos.agora_ai.vectorstore = shared_vectorstore
+
+            # NEG 공유
+            if self.neg and hasattr(self.neg, 'agora_ai'):
+                self.neg.agora_ai.crawled_data = shared_crawled_data
+                self.neg.agora_ai.vectorstore = shared_vectorstore
+            # JUDGE 공유
+            if self.judge:
+                if hasattr(self.judge, 'agora_ai'):
+                    self.judge.agora_ai.crawled_data = shared_crawled_data
+                    self.judge.agora_ai.vectorstore = shared_vectorstore
+                else:
+                    self.judge.crawled_data = shared_crawled_data
+                    self.judge.vectorstore = shared_vectorstore
+        else:
+            print("❌ 크롤링이나 벡터 스토어 생성에 실패하여, 결과를 공유할 수 없습니다.")
+
 
     def evaluate(self):
         """판사가 최종 판결문(결론)을 생성하고, 토론 내용을 요약"""
-        self.debate["result"] = self.judge.generate_text("판사의 최종 판결문 요청 프롬프트")
+        self.debate["result"] = self.judge.generate_text(f"Statement: {self.debate['debate_log']} Judge's final verdict: First, explain the reason for the winner. Then, provide the final ruling: either 'positive' or 'negative'.")
         self.summarize()
         return self.debate["result"]
 

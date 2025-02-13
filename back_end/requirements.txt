@@ -11,3 +11,6 @@ fastapi
 uvicorn
 ollama
 python-multipart
+selenium
+beautifulsoup4
+webdriver-manager

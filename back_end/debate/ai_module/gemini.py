@@ -8,14 +8,14 @@ class GeminiAPI:
         self.api_key = api_key
         genai.configure(api_key=self.api_key)
         self.model = genai.GenerativeModel('gemini-pro')
-        self.role = ""  # 기본 시스템 역할 (없으면 빈 문자열)
+        self.personality = ""  # 기본 시스템 역할 (없으면 빈 문자열)
         
-    def set_role(self, role_text: str):
+    def set_personality(self, personality_text: str):
         """
         시스템 역할을 설정하여 모든 프롬프트에 선행하는 지침으로 사용합니다.
-        :param role_text: 시스템 역할 또는 지침 텍스트
+        :param personality_text: 시스템 역할 또는 지침 텍스트
         """
-        self.role = role_text
+        self.personality = personality_text
         print("시스템 역할이 설정되었습니다.")
 
     def generate_text(self, user_prompt: str, max_tokens: int = 200) -> str:
@@ -27,8 +27,8 @@ class GeminiAPI:
         :return: 생성된 텍스트
         """
         full_prompt = user_prompt
-        if self.role:
-            full_prompt = f"System: {self.role}\nUser: {user_prompt}"
+        if self.personality:
+            full_prompt = f"personality:{self.personality}\n{user_prompt}"
         try:
             response = self.model.generate_content(
                 full_prompt,
@@ -56,8 +56,8 @@ class GeminiAPI:
             context = ""
             print(f"벡터스토어 검색 실패: {e}")
 
-        if self.role:
-            full_prompt = f"System: {self.role}\nContext: {context}\nUser: {user_prompt}"
+        if self.personality:
+            full_prompt = f"System: {self.personality}\nContext: {context}\nUser: {user_prompt}"
         else:
             full_prompt = f"Context: {context}\nUser: {user_prompt}"
             
@@ -66,7 +66,7 @@ class GeminiAPI:
                 full_prompt,
                 generation_config={"max_output_tokens": max_tokens}
             )
-            return response.text
+            return response.text if response.text else "답변 없음"
         except Exception as e:
             return f"Error: {str(e)}"
 

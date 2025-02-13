@@ -24,6 +24,7 @@ class MongoDBConnection:
     #RDBMS에서의 insert 문을 대체
     def insert_data(self, collection_name: str, data:dict):
         return self.db[collection_name].insert_one(data).inserted_id
+    
     #RDBMS 쿼리문에서의 Select문을 대체 - id로 선택.
     def select_data_from_id(self, collection_name: str, id:str):
         return self.db[collection_name].find_one({"_id":ObjectId(id)})
@@ -34,7 +35,7 @@ class MongoDBConnection:
 
     #RDBMS 쿼리문에서의 Update문을 대체.
     def update_data(self, collection_name: str, data:dict):
-        return self.db[collection_name].update_one(data)
+        return self.db[collection_name].update_one({"_id":data["_id"]}, {"$set":data})
 
     def close_connection(self):
         """
