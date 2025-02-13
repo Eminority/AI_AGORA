@@ -3,7 +3,7 @@ from datetime import datetime
 from dotenv import load_dotenv
 import google.generativeai as genai
 from db_module import MongoDBConnection
-from vectorstore_module import VectorStoreHandler  # 벡터스토어 관련 모듈 임포트
+
 
 # GeminiAPI: 기존 Gemini API를 사용하며, 벡터스토어 기반 컨텍스트 활용 기능을 추가합니다.
 
@@ -135,60 +135,3 @@ class GeminiAPI:
         if self.db_connection:
             self.db_connection.close_connection()
         print("Gemini API 연결이 해제되었습니다.")
-
-
-
-
-
-
-if __name__ == "__main__":
-    load_dotenv()  # .env 파일 로드
-    GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
-    MONGO_URI = os.getenv("MONGO_URI")
-    DB_NAME = os.getenv("DB_NAME") or "gemini_db"
-
-    if not GEMINI_API_KEY:
-        raise ValueError("GEMINI_API_KEY가 .env 파일에 설정되어 있지 않습니다.")
-
-    # MongoDB 연결 생성
-    db_connection = MongoDBConnection(MONGO_URI, DB_NAME)
-    
-    # GeminiAPI 인스턴스 생성
-    gemini = GeminiAPI(GEMINI_API_KEY, db_connection=db_connection)
-    
-    # 1. 시스템 역할 설정 (예: 판사 역할)
-    gemini.set_role("당신은 판사로 찬반 토론을 진행합니다.")
-    
-    # 2. 사용자 프롬프트 예시
-    user_prompt = "토론 주제에 대해서 간략하게 설명해줘."
-    
-    # 3. 사용자 프롬프트를 DB에 저장
-    gemini.insert_prompt(user_prompt)
-    
-    # 4. Gemini API를 사용하여 기본 응답 생성
-    response_text = gemini.generate_text(user_prompt)
-    print("판사 (Gemini API):\n", response_text)
-    
-    # 5. 생성된 응답을 DB에 저장
-    gemini.save_response_to_db("responses", user_prompt, response_text)
-    
-    # --- 벡터스토어를 이용한 답변 생성 예시 ---
-    # VectorStoreHandler 인스턴스 생성 (임베딩 모델 및 청크 설정은 필요에 따라 조정)
-    vector_handler = VectorStoreHandler(chunk_size=500, chunk_overlap=50)
-    
-    # 예시: 토론 주제 관련 자료 (실제 운영 시 크롤링 결과 등으로 대체)
-    topic_text = (
-        "토론 주제: 인공지능의 윤리적 문제에 대해 다양한 관점이 존재합니다. "
-        "찬성 측은 기술 발전과 혁신의 필요성을 강조하며, 반대 측은 개인정보 보호와 사회적 불평등 문제를 지적합니다. "
-        "이와 관련해 여러 연구와 사례가 보고되고 있습니다."
-    )
-    
-    # 주제 자료를 벡터스토어에 저장 (FAISS 인스턴스 생성)
-    topic_vectorstore = vector_handler.store_topic_material(topic_text)
-    
-    # 6. 벡터스토어 기반 컨텍스트를 포함한 Gemini API 응답 생성
-    response_text_vs = gemini.generate_text_with_vectorstore(user_prompt, topic_vectorstore, k=3, max_tokens=200)
-    print("판사 (Gemini API with VectorStore):\n", response_text_vs)
-    
-    # 7. Gemini API 및 MongoDB 연결 종료
-    gemini.close_connection()
