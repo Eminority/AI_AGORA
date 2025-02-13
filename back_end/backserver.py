@@ -44,17 +44,15 @@ debateManager = DebateManager(participant_factory=participant_factory, db_connec
 
 # 토론 생성 API
 @app.post("/debate")
-def create_debate(pos_name: str = Form(...),
-                  pos_ai: str = Form(...),
-                  neg_name: str = Form(...),
-                  neg_ai: str = Form(...),
+def create_debate(pos_id: str = Form(...),
+                  neg_id: str = Form(...),
                   topic: str = Form(...)):
-    debate_id = debateManager.create_debate(pos_name,
-                                            pos_ai,
-                                            neg_name,
-                                            neg_ai,
-                                            topic)
-    return {"message": "토론이 생성되었습니다.", "topic": topic, "id":debate_id}
+    pos = db_connection.select_data_from_id("object", pos_id)
+    neg = db_connection.select_data_from_id("object", neg_id)
+
+    # debate_manager 수정되면 끼우기
+
+    return #{"message": "토론이 생성되었습니다.", "topic": topic, "id":debate_id}
 
 # 토론 상태 확인 API
 @app.get("/debate/status")

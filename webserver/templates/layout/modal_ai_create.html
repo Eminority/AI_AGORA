@@ -1,0 +1,50 @@
+<div class="modai-dialog modal-dialog-centered">
+    <div class="modal-content">
+        <!-- ai create modal header -->
+        <div class="modal-header">
+            <h4 class="modal-title">AI 생성하기</h4>
+            <button type="button" class="close" data-dismiss="modal">&times;</button>
+        </div>
+        <!-- ai create modal body -->
+        <div class="modal-body">
+            <div>
+                <form id="yoloDetectForm" method="post" enctype="multipart/formdata">
+                    <div class="container">
+                        <label class="custom-file-label" for="original_image">이미지 넣기</label>
+                        <input class="custom-file-input" type="file" id="original_image" name="original_image" accept="image/*" />
+                    </div>
+                    <div>
+                        <button type="submit">이미지 분석</button>
+                    </div>
+                </form>
+            </div>
+            <div>
+                <form id="ImageSelectedForm" method="post" enctype="multipart/formdata">
+                    <div>
+                        <p>탐지된 객체 목록</p>
+                        <div id="detected-list"></div>
+                    </div>
+                    <div>
+                        <p>사용할 AI</p>
+                        <div id="ai-list">
+                            <label>
+                                <input type="radio" name="ai" value="GEMINI" checked /> GEMINI
+                            </label>
+                            <label>
+                                <input type="radio" name="ai" value="" /> Test1
+                            </label>
+                            <label>
+                                <input type="radio" name="ai" value=""  /> Test2
+                            </label>
+                        </div>
+                    </div>
+                    <button type="submit">설정 완료</button>
+                </form>
+            </div>
+        </div>
+        <!-- ai create modal footer -->
+        <div class="modal-footer">
+            <button type="button" class="btn btn-danger" data-dismiss="modal"> 닫기 </button>
+        </div>
+    </div>
+</div>
