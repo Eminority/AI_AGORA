@@ -251,19 +251,40 @@ class Debate:
             print("❌ 크롤링이나 벡터 스토어 생성에 실패하여, 결과를 공유할 수 없습니다.")
 
 
-    def evaluate(self):
-        """판사가 최종 판결문(결론)을 생성하고, 토론 내용을 요약"""
-        self.debate["result"] = self.judge.generate_text(f"Statement: {self.debate['debate_log']} Judge's final verdict: First, explain the reason for the winner. Then, provide the final ruling: either 'positive' or 'negative'.")
-        self.summarize()
-        return self.debate["result"]
+    # def evaluate(self):
+    #     """판사가 최종 판결문(결론)을 생성하고, 토론 내용을 요약"""
+    #     self.debate["result"] = self.judge.generate_text(f"Statement: {self.debate['debate_log']} Judge's final verdict: First, explain the reason for the winner. Then, provide the final ruling: either 'positive' or 'negative'.")
+    #     self.summarize()
+    #     return self.debate["result"]
 
-    def summarize(self):
-        """토론 내용을 요약(필요 시 요약 로직 적용 가능)"""
-        summary = self.debate["summary"]
-        summary["summary_pos"] = ""
-        summary["summary_neg"] = ""
-        summary["summary_arguments"] = ""
-        summary["summary_verdict"] = ""
+    def evaluate(self):
+        # Generate the evaluation text from the judge
+        result_text = self.judge.generate_text(
+            f"Statement: {self.debate['debate_log']}\n\n"
+            "Evaluate the logical strength of both the Pro and Con sides on a scale totaling 100 points, ensuring that the Pro score and Con score sum to 100. "
+            "For example, if the Pro side scores 65, then the Con side should score 35. "
+            "Please conclude your answer with the final score in the following format: 'Final Score - Pro: X'."
+        )
+
+        # Extract the Pro score from the result text using a regular expression
+        import re
+        match = re.search(r'Final Score\s*-\s*Pro:\s*(\d+)', result_text)
+        
+        if match:
+            pro_score = int(match.group(1))
+            # Determine the result based on the pro score
+            if pro_score > 50:
+                self.debate["result"] = "pos"
+            elif pro_score < 50:
+                self.debate["result"] = "neg"
+            else:
+                self.debate["result"] = "draw"
+        else:
+            # Fallback in case the expected format is not found
+            self.debate["result"] = "draw"
+            
+        return self.debate["result"]
+    
 
     def load(self):
         """데이터베이스에서 저장된 토론 정보를 불러와 현재 객체에 저장"""
