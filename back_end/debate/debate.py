@@ -189,18 +189,70 @@ class Debate:
         return result
 
     def ready_to_debate(self):
-        """참가자와 판사가 토론 주제에 대해 미리 자료 수집/준비를 수행"""
+        """
+        참가자와 판사가 토론 주제에 대해 자료를 수집 및 준비하는 함수.
+        크롤링과 벡터 스토어 생성은 한 번만 수행한 후,
+        그 결과(크롤링 데이터와 벡터스토어)를 모든 참가자에게 공유한다.
+        """
         topic = self.debate["topic"]
+        shared_crawled_data = None
+        shared_vectorstore = None
 
-
+        # [1] 한 참가자(우선순위: pos → neg → judge)를 통해 크롤링 및 벡터 스토어 생성
         if self.pos and hasattr(self.pos, 'agora_ai'):
+            print("[INFO] POS 측에서 크롤링을 실행합니다.")
             self.pos.agora_ai.crawling(topic)
-            self.pos.agora_ai.set_role(f"Prompt affirming the topic of {topic}")
-        if self.neg and hasattr(self.neg, 'agora_ai'):
+            shared_crawled_data = self.pos.agora_ai.crawled_data
+            shared_vectorstore = self.pos.agora_ai.vectorstore
+
+        elif self.neg and hasattr(self.neg, 'agora_ai'):
+            print("[INFO] NEG 측에서 크롤링을 실행합니다.")
             self.neg.agora_ai.crawling(topic)
-            self.neg.agora_ai.set_role(f"Prompt negating the topic of {topic}")
-        if self.judge:
-            self.judge.crawling(topic)
+            shared_crawled_data = self.neg.agora_ai.crawled_data
+            shared_vectorstore = self.neg.agora_ai.vectorstore
+
+        elif self.judge:
+            if hasattr(self.judge, 'agora_ai'):
+                print("[INFO] JUDGE 측(agora_ai 있음)에서 크롤링을 실행합니다.")
+                self.judge.agora_ai.crawling(topic)
+                shared_crawled_data = self.judge.agora_ai.crawled_data
+                shared_vectorstore = self.judge.agora_ai.vectorstore
+            else:
+                print("[INFO] JUDGE 측에서 크롤링을 실행합니다.")
+                if hasattr(self.judge, 'crawling'):
+                    self.judge.crawling(topic)
+                # getattr를 사용해 속성이 없으면 None을 기본값으로 사용
+                shared_crawled_data = getattr(self.judge, 'crawled_data', None)
+                shared_vectorstore = getattr(self.judge, 'vectorstore', None)
+        else:
+            print("[ERROR] 크롤링을 수행할 참가자가 없습니다.")
+            return  # 더 이상 진행할 수 없으므로 함수 종료
+
+        # [2] 크롤링 및 벡터 스토어 생성 결과를 모든 참가자에게 공유
+        if shared_crawled_data is not None and shared_vectorstore is not None:
+            # POS 공유
+            if self.pos and hasattr(self.pos, 'agora_ai'):
+                self.pos.agora_ai.crawled_data = shared_crawled_data
+                self.pos.agora_ai.vectorstore = shared_vectorstore
+                self.pos.agora_ai.set_role(f"Prompt affirming the topic of {topic}")
+
+            # NEG 공유
+            if self.neg and hasattr(self.neg, 'agora_ai'):
+                self.neg.agora_ai.crawled_data = shared_crawled_data
+                self.neg.agora_ai.vectorstore = shared_vectorstore
+                self.neg.agora_ai.set_role(f"Prompt negating the topic of {topic}")
+
+            # JUDGE 공유
+            if self.judge:
+                if hasattr(self.judge, 'agora_ai'):
+                    self.judge.agora_ai.crawled_data = shared_crawled_data
+                    self.judge.agora_ai.vectorstore = shared_vectorstore
+                else:
+                    self.judge.crawled_data = shared_crawled_data
+                    self.judge.vectorstore = shared_vectorstore
+        else:
+            print("❌ 크롤링이나 벡터 스토어 생성에 실패하여, 결과를 공유할 수 없습니다.")
+
 
     def evaluate(self):
         """판사가 최종 판결문(결론)을 생성하고, 토론 내용을 요약"""
