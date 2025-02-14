@@ -43,7 +43,7 @@ async def create_profile(selected_object: str = Form(...),
     url = f"{config.debate_server_uri}/profile/create"
     with httpx.Client() as client:
         response = client.post(
-            url, json = {"name":selected_object,
+            url, data = {"name":selected_object,
                          "img":file_path,
                          "ai":ai}
         )

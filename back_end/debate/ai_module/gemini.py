@@ -48,19 +48,27 @@ class GeminiAPI:
         :param max_tokens: 생성할 최대 토큰 수
         :return: 생성된 텍스트
         """
+        context = None
         try:
             # 벡터스토어에서 유사 문서 검색 (각 문서는 page_content 속성을 가짐)
-            search_results = vectorstore.similarity_search(user_prompt, k=k)
-            context = "\n".join([doc.page_content for doc in search_results])
+            if vectorstore:
+                search_results = vectorstore.similarity_search(user_prompt, k=k)
+                context = "\n".join([doc.page_content for doc in search_results])
+
         except Exception as e:
-            context = ""
             print(f"벡터스토어 검색 실패: {e}")
 
+
+        full_prompt = ""
+
         if self.personality:
-            full_prompt = f"System: {self.personality}\nContext: {context}\nUser: {user_prompt}"
-        else:
-            full_prompt = f"Context: {context}\nUser: {user_prompt}"
-            
+            full_prompt += f"System: {self.personality}\n"
+        if context:
+            full_prompt += f"Context: {context}\n"
+        if user_prompt:
+            full_prompt += f"User: {user_prompt}"
+
+
         try:
             response = self.model.generate_content(
                 full_prompt,
