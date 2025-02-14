@@ -16,3 +16,4 @@ beautifulsoup4
 webdriver-manager
 ultralytics
 langchain_google_genai
+wikipedia
