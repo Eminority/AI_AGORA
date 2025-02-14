@@ -60,12 +60,12 @@
                             body: formData // FormData를 그대로 전송
                         }, 100000); // 100초 타임아웃 적용
 
-                        console.log("토론 생성 성공:", result);
+                        if (result.message){
+                            alert(result.message);
+                        }
 
                         if (result.id) {
                             window.location.href = `/debate/?id=${result.id}`; // 받은 ID로 페이지 이동
-                        } else {
-                            alert("토론 ID를 받아올 수 없습니다.");
                         }
                     } catch (error) {
                         console.error("에러 발생:", error);
