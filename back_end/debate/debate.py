@@ -80,17 +80,17 @@ class Debate:
     def progress(self):
         """
         11단계 순서:
-          1) 판사가 주제 설명
-          2) 찬성측 주장
-          3) 반대측 주장
-          4) 판사가 변론 준비시간(1초) 부여
-          5) 반대측 변론
-          6) 찬성측 변론
-          7) 판사가 최종 주장 시간(1초) 부여
-          8) 찬성측 최종 결론
-          9) 반대측 최종 결론
-          10) 판사가 판결 준비시간(1초) 부여
-          11) 판사 최종 결론 (evaluate)
+        1) 판사가 주제 설명
+        2) 찬성측 주장
+        3) 반대측 주장
+        4) 판사가 변론 준비시간(1초) 부여
+        5) 반대측 변론
+        6) 찬성측 변론
+        7) 판사가 최종 주장 시간(1초) 부여
+        8) 찬성측 최종 결론
+        9) 반대측 최종 결론
+        10) 판사가 판결 준비시간(1초) 부여
+        11) 판사 최종 결론 (evaluate)
         """
         debate = self.debate
         result = {"timestamp": None, "speaker": "", "message": ""}
@@ -110,79 +110,117 @@ class Debate:
         # 단계별 로직
         if step == 1:
             # 1. 판사가 주제 설명
-            # (필요시 토론 준비 작업)
             self.ready_to_debate()
             result["speaker"] = "judge"
-            result["message"] = self.judge.generate_text(f"System:judge\nTopic: {self.debate['topic']}\nUser:Briefly explain the topic and tell me to start arguing for it.")
-
+            result["message"] = self.judge.generate_text(
+                f"""
+                You are the judge of this debate. Your role is to introduce the topic and set the stage for a structured discussion.
+                Topic: {self.debate['topic']}
+                Briefly explain the topic and instruct the participants to begin their arguments.
+                """
+            )
+        
         elif step == 2:
             # 2. 찬성측 주장
             result["speaker"] = "pos"
-            result["message"] = self.pos.answer(f"Last statement: {self.debate['debate_log'][-1]} System: Positive feedback\nContext: Comments supporting the topic\nUser: Please provide your opinion on the topic, including supporting evidence.")
-
+            result["message"] = self.pos.answer(
+                f"""
+                You are the representative of the affirmative side in this debate. Your role is to defend the topic and provide strong supporting arguments.
+                Topic: {self.debate['topic']}
+                Last statement: {self.debate['debate_log'][-1]}
+                Present a compelling case with evidence, logical reasoning, and emphasize the benefits of this stance.
+                """
+            )
+        
         elif step == 3:
             # 3. 반대측 주장
             result["speaker"] = "neg"
-            result["message"] = self.neg.answer(f"Last statement : {self.debate['debate_log'][-2]}System: Negative feedback\nContext: Comments opposing the topic\nUser: Please share your opinion on the topic, including counterarguments.")
-
+            result["message"] = self.neg.answer(
+                f"""
+                You are the representative of the opposing side in this debate. Your role is to challenge the topic and argue against it.
+                Topic: {self.debate['topic']}
+                Last statement: {self.debate['debate_log'][-2]}
+                Present a compelling case with evidence, logical reasoning, and emphasize the drawbacks or risks of this stance.
+                """
+            )
+        
         elif step == 4:
             # 4. 판사가 변론 준비시간 1초 제공
             result["speaker"] = "judge"
-            result["message"] = "You will have 1 second to prepare your argument."
+            result["message"] = "You will have 1 second to prepare your rebuttal."
             time.sleep(1)
-
+        
         elif step == 5:
             # 5. 반대측 변론
             result["speaker"] = "neg"
-            result["message"] = self.neg.answer(f"Last statement : {self.debate['debate_log'][-3]}\nSystem: Negative argument\nContext: Comments opposing the argument\nUser: Please present your counterargument.")
-
+            result["message"] = self.neg.answer(
+                f"""
+                You are now delivering a rebuttal against the affirmative argument.
+                Last statement: {self.debate['debate_log'][-3]}
+                Critically analyze their points and provide counterarguments with logical reasoning.
+                """
+            )
+        
         elif step == 6:
             # 6. 찬성측 변론
             result["speaker"] = "pos"
-            result["message"] = self.pos.answer(f"Last statement : {self.debate['debate_log'][-3]}System: Positive argument\nContext: Comments supporting the argument\nUser: Please present your supporting argument.")
-
+            result["message"] = self.pos.answer(
+                f"""
+                You are now delivering a rebuttal against the opposing argument.
+                Last statement: {self.debate['debate_log'][-3]}
+                Refute their points and reinforce your stance with clear, logical reasoning.
+                """
+            )
+        
         elif step == 7:
             # 7. 판사가 최종 주장 시간(1초) 부여
             result["speaker"] = "judge"
-            result["message"] = "You will have 1 second to prepare your final argument."
+            result["message"] = "You will have 1 second to prepare your final statement."
             time.sleep(1)
-
+        
         elif step == 8:
             # 8. 찬성측 최종 결론
             result["speaker"] = "pos"
-            result["message"] = self.pos.answer(f"Last statement : {self.debate['debate_log'][:-2]}System: Positive final conclusion\nContext: Comments supporting the final conclusion\nUser: Please present your final supporting conclusion.")
-
+            result["message"] = self.pos.answer(
+                f"""
+                You are presenting the final conclusion for the affirmative side.
+                Last statements: {self.debate['debate_log'][:-2]}
+                Summarize your key arguments and leave a strong closing statement.
+                """
+            )
+        
         elif step == 9:
             # 9. 반대측 최종 결론
             result["speaker"] = "neg"
-            result["message"] = self.neg.answer(f"Last statement : {self.debate['debate_log'][:-3]}System: Negative final conclusion\nContext: Comments supporting the final conclusion\nUser: Please present your final supporting conclusion.")
-
+            result["message"] = self.neg.answer(
+                f"""
+                You are presenting the final conclusion for the opposing side.
+                Last statements: {self.debate['debate_log'][:-3]}
+                Summarize your key arguments and leave a strong closing statement.
+                """
+            )
+        
         elif step == 10:
             # 10. 판사가 판결 준비시간(1초) 부여
             result["speaker"] = "judge"
-            result["message"] = "판결 준비 시간 1초를 갖겠습니다."
+            result["message"] = "The judge will now take 1 second to deliberate before making a final decision."
             time.sleep(1)
-
+        
         elif step == 11:
             # 11. 판사가 최종 결론
             result["speaker"] = "judge"
-            result["message"] = self.evaluate()  # evaluate() 내부에서 self.summarize() 등 수행
-            # 모든 단계가 끝났으므로 토론 종료
+            result["message"] = self.evaluate()
             debate["status"]["type"] = "end"
-
+        
         else:
-            # 1~11 범위를 벗어난 경우
             result["speaker"] = "SYSTEM"
-            result["message"] = "이미 모든 토론 단계가 종료되었습니다."
+            result["message"] = "The debate has already concluded."
         
         self.debate["debate_log"].append(result["message"])
-
-        # 로그에 기록
         debate["debate_log"].append(result)
         result["timestamp"] = datetime.now()
         self.save()
 
-        # 아직 11단계가 아니면 다음 단계로 증가
         if step < self.max_step:
             debate["status"]["step"] += 1
 

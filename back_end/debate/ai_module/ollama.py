@@ -1,13 +1,16 @@
 import json
 import requests
 import subprocess
-import ollama
+from langchain_ollama import ChatOllama
+from langchain_core.messages import SystemMessage, HumanMessage
 
 class OllamaRunner:
-    def __init__(self, model_name="mistral", base_url="http://localhost:11434"):
+    def __init__(self, model_name : str, personality : str, role : str, base_url="http://localhost:11434"):
         self.model_name = model_name
         self.base_url = base_url
         self.model_installed = False  # 모델 다운로드 상태를 추적하는 변수
+        self.personality = personality
+        self.role = role
 
     def is_model_installed(self):
         """현재 설치된 Ollama 모델 목록을 확인하여 해당 모델이 있는지 검사"""
@@ -39,16 +42,16 @@ class OllamaRunner:
             print(f"⚠️ 다운로드 실패: {response.text}")
             return False
         
-    def run_model_interactive(self):
-        """Ollama 모델을 터미널에서 직접 실행 ('ollama run <model>')"""
-        if not self.pull_model():
-            print("❌ 모델 실행 실패!")
-            return
+    # def run_model_interactive(self):
+    #     """Ollama 모델을 터미널에서 직접 실행 ('ollama run <model>')"""
+    #     if not self.pull_model():
+    #         print("❌ 모델 실행 실패!")
+    #         return
 
-        print(f"🚀 '{self.model_name}' 모델을 실행 중... ")
-        subprocess.run(["ollama", "run", self.model_name])
+    #     print(f"🚀 '{self.model_name}' 모델을 실행 중... ")
+    #     subprocess.run(["ollama", "run", self.model_name])
 
-    def generate_text(self, prompt):
+    def generate_text(self, prompt : str, temperature : float, max_tokens : int) -> str:
         """프로그래밍 방식으로 텍스트를 입력하면 Ollama 모델이 응답"""
         if not self.pull_model():
             print("❌ 모델 실행 실패!")

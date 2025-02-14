@@ -1,10 +1,6 @@
-import datetime
 from langchain_community.retrievers import WikipediaRetriever
-from langchain_ollama import ChatOllama  # ✅ 최신 패키지로 변경
 from langchain.prompts import PromptTemplate
 import google.generativeai as genai
-from bson import ObjectId
-from langchain_core.messages import AIMessage
 
 class DetectPersona:
     """
