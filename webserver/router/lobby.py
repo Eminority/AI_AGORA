@@ -45,6 +45,7 @@ async def create_profile(selected_object: str = Form(...),
         response = client.post(
             url, data = {"name":selected_object,
                          "img":file_path,
-                         "ai":ai}
+                         "ai":ai},
+                         timeout=10
         )
     return response.json()

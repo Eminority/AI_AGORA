@@ -113,7 +113,9 @@ def get_debate_list():
 @app.get("/profile/list")
 def get_ai_list():
     # id - data 형태로 묶어서 데이터 전송
-    return {id : profile_manager.objectlist[id] for id in profile_manager.objectlist.keys()}
+    result = {id : profile_manager.objectlist[id] for id in profile_manager.objectlist.keys()}
+    print(result)
+    return result
 
 
 ##yolo로 이미지 판단해서 list 반환하기
@@ -140,8 +142,9 @@ def create_ai_profile(name:str = Form(...),
     if save_result.get("result") == "success":
         new_id = profile_manager.create_profile(name=name,
                                     img=save_result["file_id"],
-                                    ai=ai)
-        if new_id.get("result"):
+                                    ai=ai).get("id")
+        if new_id:
+            print(new_id)
             return {"result":"success", "id":new_id}
     return {"result":"error"}
 
