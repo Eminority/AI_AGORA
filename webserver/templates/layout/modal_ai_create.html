@@ -8,7 +8,11 @@
         <!-- ai create modal body -->
         <div class="modal-body">
             <div>
+<<<<<<< HEAD
                 <form id="yoloDetectForm" method="post" enctype="multipart/formdata">
+=======
+                <form id="yoloDetectForm"  method="post" enctype="multipart/formdata" data-object-detect-url = "{{ request.url_for('list_from_object_detect') }}">
+>>>>>>> dev0
                     <div class="container">
                         <label class="custom-file-label" for="original_image">이미지 넣기</label>
                         <input class="custom-file-input" type="file" id="original_image" name="original_image" accept="image/*" />
@@ -18,8 +22,13 @@
                     </div>
                 </form>
             </div>
+<<<<<<< HEAD
             <div>
                 <form id="ImageSelectedForm" method="post" enctype="multipart/formdata">
+=======
+            <div id="generateAI_area" style="display: none;">
+                <form id="ImageSelectedForm" method="post" enctype="multipart/formdata" data-create-profile-url = "{{ request.url_for('create_profile') }}">
+>>>>>>> dev0
                     <div>
                         <p>탐지된 객체 목록</p>
                         <div id="detected-list"></div>

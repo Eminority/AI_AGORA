@@ -47,8 +47,13 @@ class YOLODetect:
                     }
                     detected_objects.append(object_data)
 
+<<<<<<< HEAD
         # JSON 형식으로 변환
         return json.dumps(detected_objects, indent=4)
+=======
+        #list로 전송
+        return detected_objects
+>>>>>>> dev0
 
 #예시
 # from yolo_detect import YOLODetect

@@ -169,3 +169,7 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
+
+
+# 서버에 자동으로 저장되는 이미지 같이 안올라가게 하기
+back_end/image

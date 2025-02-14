@@ -23,8 +23,9 @@ class GeminiAPI:
         :param max_tokens: 생성할 최대 토큰 수
         :return: 생성된 텍스트
         """
-        full_prompt = f"Role: {self.role}\nPersonality: {self.personality}\n{user_prompt}"
-        
+        full_prompt = user_prompt
+        if self.personality:
+            full_prompt = f"personality:{self.personality}\n{user_prompt}"
         try:
             response = self.model.generate_content(
                 full_prompt,
@@ -56,8 +57,11 @@ class GeminiAPI:
             context = ""
             print(f"⚠️ 벡터스토어 검색 실패: {e}")
 
-        full_prompt = f"Context: {context}\nUser: {user_prompt}" #Role: {self.role}\nPersonality: {self.personality}\n
-        
+        if self.personality:
+            full_prompt = f"System: {self.personality}\nContext: {context}\nUser: {user_prompt}"
+        else:
+            full_prompt = f"Context: {context}\nUser: {user_prompt}"
+            
         try:
             response = self.model.generate_content(
                 full_prompt,
