@@ -11,6 +11,7 @@ from ai_profile.ai_profile import ProfileManager
 from yolo_detect import YOLODetect
 from image_manager import ImageManager
 from detect_persona import DetectPersona
+from debate.check_topic import CheckTopic
 # 환경 변수 로드
 load_dotenv()
 
@@ -55,17 +56,24 @@ profile_manager = ProfileManager(db=db_connection, persona_module=detect_persona
 #토론 관리 인스턴스 생성
 debateManager = DebateManager(participant_factory=participant_factory, db_connection=db_connection)
 
+#토론 주제 확인 객체
+topic_checker = CheckTopic(AI_API_KEY["GEMINI"])
+
 # 토론 생성 API
 @app.post("/debate")
 def create_debate(pos_id: str = Form(...),
                   neg_id: str = Form(...),
                   topic: str = Form(...)):
-    pos = db_connection.select_data_from_id("object", pos_id)
-    neg = db_connection.select_data_from_id("object", neg_id)
+    
+    if topic_checker.checktopic(topic):
+        pos = db_connection.select_data_from_id("object", pos_id)
+        neg = db_connection.select_data_from_id("object", neg_id)
 
-    id = debateManager.create_debate(pos, neg, topic)
+        id = debateManager.create_debate(pos, neg, topic)
 
-    return {"message": "토론이 생성되었습니다.", "topic": topic, "id":id}
+        return {"result":True, "message": "토론이 생성되었습니다.", "topic": topic, "id":id}
+    else:
+        return {"result":False, "message": "토론 주제가 적절하지 않습니다."}
 
 # 토론 상태 확인 API
 @app.get("/debate/status")
