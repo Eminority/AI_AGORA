@@ -25,14 +25,19 @@ async def get_debate_info(id:str):
 
 ##토론 만들기
 @router.post("/debate/create")
-async def create_debate(request:Request):
+async def create_debate(pos_id:str=Form(...),
+                        neg_id:str=Form(...),
+                        topic:str=Form(...)):
+    print(pos_id, neg_id, topic)
     url = f"{config.debate_server_uri}/debate"
-    body = await request.body()
-    content_type = request.headers.get("Content-Type", "application/x-www-form-urlencoded")
-    headers = {"Content-Type" : content_type}
-
     with httpx.Client() as client:
-        response = client.post(url, headers=headers, content=body)
+        response = client.post(
+            url,
+            data={ "pos_id" : pos_id,
+                    "neg_id" : neg_id,
+                    "topic" : topic
+                },
+            timeout=100)
     return response.json()
 
 #토론 진행하기
@@ -43,7 +48,7 @@ async def progress_debate(request:Request):
     content_type = request.headers.get("Content-Type", "application/x-www-form-urlencoded")
     headers = {"Content-Type" : content_type}
     with httpx.Client() as client:
-        response = client.post(url, headers=headers, content=body)
+        response = client.post(url, headers=headers, content=body, timeout=10)
     return response.json()
 
 

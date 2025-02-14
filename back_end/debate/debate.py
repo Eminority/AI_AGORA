@@ -62,13 +62,12 @@ class Debate:
         }
 
         # _id 필드를 UUID로 생성하여 할당
-        self.debate["_id"] = str(uuid.uuid4())
+        # create에 집어넣으면 자동으로 id 찍혀나오니까 생략해보기
+        # self.debate["_id"] = str(uuid.uuid4())
 
         # DB에 삽입 후 실제 _id(또는 ObjectId) 값을 debate dict에 반영
-        print(self.debate)
         debate_id = self.db_connection.insert_data("debate",self.debate)
         self.debate["_id"] = debate_id
-
         # 참가자 생성 (pos, neg)
         self.pos = self.participant_factory.make_participant(participants["pos"])
         self.neg = self.participant_factory.make_participant(participants["neg"])
@@ -200,6 +199,7 @@ class Debate:
         shared_vectorstore = None
 
         # [1] 한 참가자(우선순위: pos → neg → judge)를 통해 크롤링 및 벡터 스토어 생성
+        
         if self.pos and hasattr(self.pos, 'agora_ai'):
             print("[INFO] POS 측에서 크롤링을 실행합니다.")
             self.pos.agora_ai.crawling(topic)
