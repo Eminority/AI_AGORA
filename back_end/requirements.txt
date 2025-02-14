@@ -10,6 +10,10 @@ langchain-huggingface
 fastapi
 uvicorn
 ollama
+python-multipart
 selenium
 beautifulsoup4
 webdriver-manager
+ultralytics
+langchain_google_genai
+wikipedia

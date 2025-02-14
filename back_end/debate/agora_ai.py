@@ -7,7 +7,7 @@ class Agora_AI:
     관리하는 클래스.
     """
 
-    def __init__(self, ai_type: str, ai_instance, vector_handler: VectorStoreHandler = None):
+    def __init__(self, ai_type: str, ai_instance, personality:str="", vector_handler: VectorStoreHandler = None):
         """
         Args:
             ai_type (str): AI 모델 타입 (예: 'GEMINI', 'ollama' 등).
@@ -18,32 +18,17 @@ class Agora_AI:
         self.ai_type = ai_type
         self.ai_instance = ai_instance
         self.vector_handler = vector_handler if vector_handler is not None else VectorStoreHandler()
-        
+        self.personality = personality
         self.vectorstore = None
         self.crawled_data = []
         self.debate_processor = DebateDataProcessor()
+        # self.set_personality()
 
-    def set_role(self, role: str):
-        """
-        AI 모델의 역할(Role)을 설정한다.
-        - "judge" -> "Judge side of the topic"
-        - "pos"   -> "Positive side of the topic"
-        - "neg"   -> "Negative side of the topic"
-        
-        특정 모델 타입(GEMINI 등)에서만 역할 설정을 호출한다고 가정.
-        """
-        role_dict = {
-            "judge": "Judge side of the topic",
-            "pos": "Positive side of the topic",
-            "neg": "Negative side of the topic"
-        }
-        
-        # 입력받은 role이 딕셔너리에 있으면 해당 값으로 치환
-        selected_role = role_dict.get(role.lower(), role)
-        
-        # ai_type이 GEMINI일 때만 set_role을 수행한다고 가정
-        if self.ai_type.upper() == "GEMINI":
-            self.ai_instance.set_role(selected_role)
+    def set_personality(self):
+        if self.ai_instance:
+            self.ai_instance.set_personality(self.personality)
+
+
 
     def crawling(self, topic: str):
         """

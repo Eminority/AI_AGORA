@@ -1,4 +1,3 @@
-from db_module import MongoDBConnection
 from .agora_ai import Agora_AI
 from .ai_module.ai_factory import AI_Factory
 from vectorstore_module import VectorStoreHandler
@@ -12,7 +11,7 @@ class ParticipantFactory:
         # ai type을 기반으로 instance 만들어주기
         ai_instance = self.ai_factory.create_ai_instance(ai_type)
         # 만들어진 ai instance를 참가자 형태로 만들기
-        agora_ai = Agora_AI(ai_type, ai_instance, self.vector_handler)
+        agora_ai = Agora_AI(ai_type=ai_type, ai_instance=ai_instance, personality=data.get("object_attribute", ""), vector_handler=self.vector_handler)
         return Participant(id=data["_id"], name=data["name"], agora_ai=agora_ai, img=data["img"])
 
 
