@@ -24,7 +24,7 @@ class ProfileManager:
                         name:str=None,
                         img:str=None,
                         ai:str=None):
-        if not self.duplicate_object_check(name):
+        if not self.duplicate_object_check(name, ai):
             return {"result":False}
         object_attribute = self.persona_module.get_traits(name)
         new_obj = Profile(name=name,
@@ -38,12 +38,12 @@ class ProfileManager:
         self.objectlist[new_obj.data["_id"]] = new_obj
         return {"resulr":True, "id":str(new_obj.data["_id"])}
     
-    def duplicate_object_check(self, name:str):
+    def duplicate_object_check(self, name:str, ai:str):
         """
         참이면 중복없음
         거짓이면 중복있음
         """
-        search_result = self.db.select_data_from_query("object",{"name":name})
+        search_result = self.db.select_data_from_query("object",{"name":name, "ai":ai})
         print(search_result)
         if not search_result:
             return True

@@ -60,6 +60,7 @@ class ImageManager:
         image_name = image_path.split("\\")[-1]
         target_image = Image.open(image_path)
         result = {}
+        print(objectlist)
         for detected_object in objectlist:
             bbox = detected_object["bounding_box"]
             x1 = int(bbox["x1"])
