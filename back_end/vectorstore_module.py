@@ -14,39 +14,17 @@ def create_vectorstore(splits: List[Document], embedding_model):
     vectordb = FAISS.from_documents(splits, embedding_model)
     return vectordb
 
-<<<<<<< HEAD
-
-#        :param chunk_size: 텍스트 분할 시 청크 크기 (기본값: 500)
-#        :param chunk_overlap: 청크 간의 중복 길이 (기본값: 50)   
-class VectorStoreHandler:
-    def __init__(self, chunk_size: int = 500, chunk_overlap: int = 50):
-
-
-=======
 class VectorStoreHandler:
     def __init__(self, chunk_size: int = 500, chunk_overlap: int = 50):
         """
         :param chunk_size: 텍스트 분할 시 청크 크기 (기본값: 500)
         :param chunk_overlap: 청크 간의 중복 길이 (기본값: 50)
         """
->>>>>>> 4e1d7eb89fae2b707d29402c21817c364bdfe930
         self.chunk_size = chunk_size
         self.chunk_overlap = chunk_overlap
         self.embeddings = create_embedding_model()
         self.vectorstore = None
     
-<<<<<<< HEAD
-    def split_text(self, text: str) -> list:
-        splitter = CharacterTextSplitter(chunk_size=self.chunk_size, chunk_overlap=self.chunk_overlap)
-        chunks = splitter.split_text(text)
-        return chunks
-    
-
-    #이후에 단순히 저장모듈로 사용해 다방면으로 활용할 수 있게 바꿀 계획
-    def vectorstoring_from_text(self, text: str) -> FAISS:
-        """
-        주제에 관한 자료(크롤링 등으로 수집한 텍스트)를 분할하여 FAISS vectorstore에 저장합니다.
-=======
     def split_text(self, text: str) -> List[Document]:
         """
         주어진 텍스트를 일정한 크기의 청크로 분할하여 Document 객체 리스트로 반환한다.
@@ -67,7 +45,6 @@ class VectorStoreHandler:
         
         # 텍스트를 청크로 분할
         chunks = splitter.split_text(text)
->>>>>>> 4e1d7eb89fae2b707d29402c21817c364bdfe930
         
         # 각 청크를 Document 객체로 변환
         documents = [Document(page_content=chunk) for chunk in chunks]
