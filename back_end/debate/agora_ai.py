@@ -22,7 +22,7 @@ class Agora_AI:
         self.vectorstore = None
         self.crawled_data = []
         self.debate_processor = DebateDataProcessor()
-        self.set_personality()
+        # self.set_personality()
 
     def set_personality(self):
         if self.ai_instance:

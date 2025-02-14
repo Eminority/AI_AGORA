@@ -2,19 +2,19 @@ import google.generativeai as genai
 
 # GeminiAPI: 기존 Gemini API를 사용하며, 벡터스토어 기반 컨텍스트 활용 기능을 추가합니다.
 class GeminiAPI:
-    def __init__(self, api_key: str, personality: str = "", role: str = ""):
+    def __init__(self, api_key: str):
         """
         Gemini 모델을 초기화할 때, 기본적으로 personality(성격)와 role(역할)을 설정함.
         """
         self.api_key = api_key
         genai.configure(api_key=self.api_key)
         self.model = genai.GenerativeModel('gemini-2.0-flash') #모델 변경 pro -> 2.0-flash
-        self.personality = personality  # 기본 성격
-        self.role = role  # 역할 설정
+        # self.personality = personality  # 기본 성격
+        # self.role = role  # 역할 설정
         
         # print(f"✅ Gemini 모델이 초기화되었습니다! (성격: {self.personality}, 역할: {self.role})")
 
-    def generate_text(self, user_prompt: str, temperature: float, max_tokens: int) -> str:
+    def generate_text(self, user_prompt: str, max_tokens: int) -> str:
         """
         Gemini 모델을 사용하여 텍스트를 생성합니다.
         
@@ -29,7 +29,7 @@ class GeminiAPI:
             response = self.model.generate_content(
                 full_prompt,
                 generation_config={
-                    "temperature": temperature,
+                    # "temperature": temperature,
                     "max_output_tokens": max_tokens
                 }
             )
@@ -37,7 +37,7 @@ class GeminiAPI:
         except Exception as e:
             return f"Error: {str(e)}"
 
-    def generate_text_with_vectorstore(self, user_prompt: str, vectorstore, temperature : float, max_tokens: int, k: int = 3) -> str:
+    def generate_text_with_vectorstore(self, user_prompt: str, vectorstore, max_tokens: int, k: int = 3) -> str:
         """
         벡터스토어에서 관련 컨텍스트를 검색한 후, 이를 포함하여 Gemini API로 답변을 생성합니다.
         
@@ -56,13 +56,13 @@ class GeminiAPI:
             context = ""
             print(f"⚠️ 벡터스토어 검색 실패: {e}")
 
-        full_prompt = f"Role: {self.role}\nPersonality: {self.personality}\nContext: {context}\nUser: {user_prompt}"
+        full_prompt = f"Context: {context}\nUser: {user_prompt}" #Role: {self.role}\nPersonality: {self.personality}\n
         
         try:
             response = self.model.generate_content(
                 full_prompt,
                 generation_config={
-                    "temperature": temperature,
+                    # "temperature": temperature,
                     "max_output_tokens": max_tokens
                 }
             )
