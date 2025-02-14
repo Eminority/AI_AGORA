@@ -1,0 +1,60 @@
+{% extends 'layout/body.html' %}
+
+{% block title %} AI Agora {% endblock %}
+
+
+{% block content %}
+    <div class="content-container">
+        <h1> DEBATE </h1>
+        <p> 찬성 측 참가자 이름 : <span class="pos_name"></span></p>
+        <p> 반대 측 참가자 이름 : <span class="neg_name"></span></p>
+        <p> 주제 : <span class="topic"></span></p>
+    </div>
+
+    {% include 'layout/chat.html' %}
+
+    <script src="{{ url_for('static', path='js/chat.js') }}"></script>
+    <script src="{{ url_for('static', path='js/autoprogress_debate.js') }}"></script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", async function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const debateId = urlParams.get("id");
+    
+            if (!debateId) {
+                console.error("토론 ID가 없습니다.");
+                return;
+            }
+    
+            try {
+                const response = await fetch(`/debate/info?id=${debateId}`);
+                if (!response.ok) throw new Error("서버 응답 실패");
+    
+                const data = await response.json();
+    
+                document.querySelector(".pos_name").textContent = data.participants.pos.name || "알 수 없음";
+                document.querySelector(".neg_name").textContent = data.participants.neg.name || "알 수 없음";
+                document.querySelector(".topic").textContent = data.topic || "알 수 없음";
+    
+                // 📌 debate_log 데이터를 채팅창에 추가 (공용 addMessageToChat() 사용)
+                if (data.debate_log && Array.isArray(data.debate_log)) {
+                    data.debate_log.forEach(log => {
+                        const sender = log.speaker || "알 수 없음";
+                        const message = log.timestamp + "\n" + log.message || "내용 없음";
+                        addMessageToChat(sender, message, "received");
+                    });
+                }
+
+                 // 📌 AI 토론자가 존재하면 자동으로 `/debate/progress` 요청을 반복 실행
+                 if (data.participants.pos.ai && data.participants.neg.ai) {
+                    document.querySelector(".chat-input").style.display = "none";
+                    autoProgressDebate(debateId);
+                }
+
+            } catch (error) {
+                console.error("데이터 불러오기 실패:", error);
+            }
+        });
+    </script>
+    
+{% endblock %}

@@ -20,7 +20,7 @@ class GeminiAPI:
         genai.configure(api_key=self.api_key)
         self.model = genai.GenerativeModel('gemini-pro')
         self.role = ""  # 기본 시스템 역할 (없으면 빈 문자열)
-        
+        self.personality = ""
         self.db_connection = db_connection
         self.db = self.db_connection.db if self.db_connection else None
 
@@ -33,17 +33,34 @@ class GeminiAPI:
         self.role = role_text
         print("시스템 역할이 설정되었습니다.")
 
+    def set_personality(self, personality_text: str):
+        """
+        캐릭터의 성격이나 어조를 설정합니다.
+        이 설정은 텍스트 생성 시 프롬프트에 함께 포함되어, AI가 해당 성격에 맞춰 응답하도록 유도합니다.
+        
+        :param personality_text: 성격이나 어조를 나타내는 문자열
+        """
+        self.personality = personality_text
+        print("성격 설정이 완료되었습니다.")
+
+
     def generate_text(self, user_prompt: str, max_tokens: int = 200) -> str:
         """
-        Gemini 모델을 사용하여 기본 텍스트를 생성합니다.
+        Gemini 모델을 사용하여 텍스트를 생성합니다.
+        역할(role)과 성격(personality)이 설정되어 있으면, 이를 프롬프트에 포함시킵니다.
         
         :param user_prompt: 사용자 입력 프롬프트
         :param max_tokens: 생성할 최대 토큰 수
         :return: 생성된 텍스트
         """
-        full_prompt = user_prompt
+        parts = []
         if self.role:
-            full_prompt = f"System: {self.role}\nUser: {user_prompt}"
+            parts.append(f"System: {self.role}")
+        if self.personality:
+            parts.append(f"Personality: {self.personality}")
+        parts.append(f"User: {user_prompt}")
+        full_prompt = "\n".join(parts)
+        
         try:
             response = self.model.generate_content(
                 full_prompt,
@@ -52,6 +69,8 @@ class GeminiAPI:
             return response.text
         except Exception as e:
             return f"Error: {str(e)}"
+        
+        
 
     def generate_text_with_vectorstore(self, user_prompt: str, vectorstore, k: int = 3, max_tokens: int = 200) -> str:
         """

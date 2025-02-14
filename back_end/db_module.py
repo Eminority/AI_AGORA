@@ -2,6 +2,8 @@ import os
 from dotenv import load_dotenv
 from pymongo import MongoClient
 import google.generativeai as genai
+from bson.objectid import ObjectId
+import pymongo
 
 # MongoDB 연결 및 데이터 저장 클래스
 class MongoDBConnection:
@@ -13,6 +15,10 @@ class MongoDBConnection:
         """
         try:
             self.client = MongoClient(uri)
+#             =uri,
+#                                       tls = True,
+#                                       tlsAllowInvalidCertificates=True  # 인증서 검증을 건너뜁니다 (개발 환경에서만!)
+# )
             self.db = self.client[db_name]
             # 연결 테스트
             self.client.admin.command('ping')
@@ -20,6 +26,21 @@ class MongoDBConnection:
         except Exception as e:
             print("❌ Connection failed:", e)
 
+    #RDBMS에서의 insert 문을 대체
+    def insert_data(self, collection_name: str, data:dict):
+        return self.db[collection_name].insert_one(data).inserted_id
+    
+    #RDBMS 쿼리문에서의 Select문을 대체 - id로 선택.
+    def select_data_from_id(self, collection_name: str, id:str):
+        return self.db[collection_name].find_one({"_id":ObjectId(id)})
+
+    #RDBMS 쿼리문에서의 Select문을 대체 - 쿼리문 작성 필요. 비어있으면 컬렉션 전체 가져옴
+    def select_data_from_query(self, collection_name:str, query:dict={}):
+        return self.db[collection_name].find(query)
+
+    #RDBMS 쿼리문에서의 Update문을 대체.
+    def update_data(self, collection_name: str, data:dict):
+        return self.db[collection_name].update_one({"_id":data["_id"]}, {"$set":data})
 
     def close_connection(self):
         """
@@ -57,5 +78,4 @@ if __name__ == "__main__":
     
     # MongoDB 연결 종료
     db_connection.close_connection()
-    
 """
