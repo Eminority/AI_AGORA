@@ -4,6 +4,7 @@ from datetime import datetime
 class ProfileManager:
     def __init__(self, db: MongoDBConnection):
         data = db.select_data_from_query(collection_name="object", query={})
+        self.db = db
         self.objectlist = {}
         for raw_object in data:
             profile = Profile(_id           = str(raw_object.get("_id")),

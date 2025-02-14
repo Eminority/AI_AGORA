@@ -110,20 +110,25 @@ def object_detect(file: UploadFile = File(...)):
     local_image_data = image_manager.save_image_in_local_from_form(file)
     result_data = {"result":local_image_data.get("result")}
     if result_data["result"]:
-        result_data["object"] = yoloDetector.detect_objects(local_image_data.get("data"))
+        detect_data = yoloDetector.detect_objects(local_image_data["data"])
+        result_data["data"] = image_manager.crop_image(local_image_data["data"], detect_data)
     return result_data
 
 
 
 #최종적으로 이미지 포함 프로필 만들기
-@app.get("/profile/create")
+@app.post("/profile/create")
 def create_ai_profile(name:str=Form(...),
                       img:str=Form(...),
                       ai:str=Form(...)):
-    new_id = profile_manager.create_profile(name=name,
-                                   img=img,
-                                   ai=ai)
-    return {"result":"success"}
+    result = image_manager.save_image_in_mongoDB_from_local(img)
+    if result.get("result") == "success":
+        new_id = profile_manager.create_profile(name=name,
+                                    img=result["file_id"],
+                                    ai=ai)
+        return {"result":"success", "id":new_id}
+    else:
+        return {"result":"error"}
 
 ##실행코드
 # uvicorn backserver:app --host 0.0.0.0 --port 8000 --reload

@@ -19,7 +19,7 @@
                 </form>
             </div>
             <div id="generateAI_area" style="display: none;">
-                <form id="ImageSelectedForm" method="post" enctype="multipart/formdata">
+                <form id="ImageSelectedForm" method="post" enctype="multipart/formdata" data-create-profile-url = "{{ request.url_for('create_profile') }}">
                     <div>
                         <p>탐지된 객체 목록</p>
                         <div id="detected-list"></div>
