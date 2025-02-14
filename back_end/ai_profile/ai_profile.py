@@ -1,11 +1,13 @@
 ## ai 프로필을 만들어서 저장하고 불러올 수 있게끔 하는 모듈
 from db_module import MongoDBConnection
 from datetime import datetime
+from detect_persona import DetectPersona
 class ProfileManager:
-    def __init__(self, db: MongoDBConnection):
+    def __init__(self, db: MongoDBConnection, persona_module:DetectPersona):
         data = db.select_data_from_query(collection_name="object", query={})
         self.db = db
         self.objectlist = {}
+        self.persona_module = persona_module
         for raw_object in data:
             profile = Profile(_id           = str(raw_object.get("_id")),
                           name              = raw_object.get("name"),
@@ -22,14 +24,31 @@ class ProfileManager:
                         name:str=None,
                         img:str=None,
                         ai:str=None):
+        if not self.duplicate_object_check(name):
+            return {"result":False}
+        object_attribute = self.persona_module.get_traits(name)
         new_obj = Profile(name=name,
                             img=img,
                             ai=ai,
+                            object_attribute=object_attribute,
                             create_time=datetime.now()
                             )
         new_obj.save(self.db)
+        print(new_obj.data)
         self.objectlist[new_obj.data["_id"]] = new_obj
-        return new_obj.data["_id"]
+        return {"resulr":True, "id":new_obj.data["_id"]}
+    
+    def duplicate_object_check(self, name:str):
+        """
+        참이면 중복없음
+        거짓이면 중복있음
+        """
+        search_result = self.db.select_data_from_query("object",{"name":name})
+        print(search_result)
+        if not search_result:
+            return True
+        else:
+            return False
 
     
 class Profile:

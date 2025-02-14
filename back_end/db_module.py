@@ -31,7 +31,11 @@ class MongoDBConnection:
 
     #RDBMS 쿼리문에서의 Select문을 대체 - 쿼리문 작성 필요. 비어있으면 컬렉션 전체 가져옴
     def select_data_from_query(self, collection_name:str, query:dict={}):
-        return self.db[collection_name].find(query)
+        cursor = self.db[collection_name].find(query)
+        result = []
+        for data in cursor:
+            result.append(data)
+        return result
 
     #RDBMS 쿼리문에서의 Update문을 대체.
     def update_data(self, collection_name: str, data:dict):

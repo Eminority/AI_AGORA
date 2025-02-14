@@ -10,6 +10,7 @@ from vectorstore_module import VectorStoreHandler
 from ai_profile.ai_profile import ProfileManager
 from yolo_detect import YOLODetect
 from image_manager import ImageManager
+from detect_persona import DetectPersona
 # 환경 변수 로드
 load_dotenv()
 
@@ -45,8 +46,11 @@ real_image_save_path = os.path.join(os.getcwd(), IMAGE_SAVE_PATH)
 os.makedirs(real_image_save_path, exist_ok=True)
 image_manager = ImageManager(db=db_connection, img_path=real_image_save_path)
 
+#persona 생성기
+detect_persona = DetectPersona(db_connection=db_connection, AI_API_KEY=AI_API_KEY["GEMINI"])
+
 #프로필 관리 객체 생성
-profile_manager = ProfileManager(db=db_connection)
+profile_manager = ProfileManager(db=db_connection, persona_module=detect_persona)
 
 #토론 관리 인스턴스 생성
 debateManager = DebateManager(participant_factory=participant_factory, db_connection=db_connection)
@@ -118,17 +122,17 @@ def object_detect(file: UploadFile = File(...)):
 
 #최종적으로 이미지 포함 프로필 만들기
 @app.post("/profile/create")
-def create_ai_profile(name:str=Form(...),
-                      img:str=Form(...),
-                      ai:str=Form(...)):
-    result = image_manager.save_image_in_mongoDB_from_local(img)
-    if result.get("result") == "success":
+def create_ai_profile(name:str = Form(...),
+                      img:str = Form(...),
+                      ai:str = Form(...)):
+    save_result = image_manager.save_image_in_mongoDB_from_local(img)
+    if save_result.get("result") == "success":
         new_id = profile_manager.create_profile(name=name,
-                                    img=result["file_id"],
+                                    img=save_result["file_id"],
                                     ai=ai)
-        return {"result":"success", "id":new_id}
-    else:
-        return {"result":"error"}
+        if new_id["result"]:
+            return {"result":"success", "id":new_id}
+    return {"result":"error"}
 
 ##실행코드
 # uvicorn backserver:app --host 0.0.0.0 --port 8000 --reload
