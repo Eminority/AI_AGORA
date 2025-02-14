@@ -20,11 +20,11 @@ class DetectPersona:
         self.local_model = "llama3.2"  # Local 모델 이름
         self.retriever = WikipediaRetriever()
 
-        try:
-            self.local_llm = ChatOllama(model=self.local_model)
-            print(f"✅ Local 모델이 '{self.local_model}'으로 설정되었습니다.")
-        except Exception as e:
-            print(f"{self.local_model} 을 찾을 수 없습니다. \n {e}")
+        # try:
+        #     self.local_llm = ChatOllama(model=self.local_model)
+        #     print(f"✅ Local 모델이 '{self.local_model}'으로 설정되었습니다.")
+        # except Exception as e:
+        #     print(f"{self.local_model} 을 찾을 수 없습니다. \n {e}")
         # GEMINI API 설정
         if AI_API_KEY:
             genai.configure(api_key=AI_API_KEY)
@@ -49,6 +49,8 @@ class DetectPersona:
             template="Based on the following information, describe the personality traits of {object_name} in only 1 briefly and short sentence words: {context}"
         )
         final_prompt = prompt_template.format(object_name=object_name, context=context)
-        traits = self.local_llm.invoke(final_prompt)  # ✅ 최신 메서드 사용
-        
+        # local llm 사용할 경우
+        # traits = self.local_llm.invoke(final_prompt)  # ✅ 최신 메서드 사용
+        response = self.gemini_model.generate_content(final_prompt)
+        traits = response.text if response else "❌ 성격 분석 실패."
         return traits

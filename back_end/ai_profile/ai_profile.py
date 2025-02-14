@@ -36,7 +36,7 @@ class ProfileManager:
         new_obj.save(self.db)
         print(new_obj.data)
         self.objectlist[new_obj.data["_id"]] = new_obj
-        return {"resulr":True, "id":new_obj.data["_id"]}
+        return {"result":True, "id":new_obj.data["_id"]}
     
     def duplicate_object_check(self, name:str):
         """

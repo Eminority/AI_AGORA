@@ -84,8 +84,11 @@ def progress_debate(id:str= Form(...),
 # 토론 전체 받아오기
 @app.get("/debate/info")
 def get_debate_history(id:str = Query(..., description="토론 id")):
-    if debateManager.debatepool[id]:
-        return debateManager.debatepool[id].debate
+    if debateManager.debatepool.get(id):
+        debatedata = debateManager.debatepool[id].debate
+        debatedata["_id"] = str(debatedata["_id"])
+        print(debatedata)
+        return debatedata
     else:
         return []
 
@@ -130,7 +133,7 @@ def create_ai_profile(name:str = Form(...),
         new_id = profile_manager.create_profile(name=name,
                                     img=save_result["file_id"],
                                     ai=ai)
-        if new_id["result"]:
+        if new_id.get("result"):
             return {"result":"success", "id":new_id}
     return {"result":"error"}
 
