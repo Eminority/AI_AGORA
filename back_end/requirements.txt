@@ -14,10 +14,8 @@ python-multipart
 selenium
 beautifulsoup4
 webdriver-manager
-<<<<<<< HEAD
 ultralytics
 langchain_google_genai
 wikipedia
-=======
-ultralytics
->>>>>>> dev0
+google
+googlesearch-python
