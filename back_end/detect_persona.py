@@ -10,8 +10,7 @@ class DetectPersona:
     - 결과를 MongoDB에 자동 저장
     """
 
-    def __init__(self, db_connection, AI_API_KEY=None):
-        self.db = db_connection  
+    def __init__(self, AI_API_KEY=None):
         self.source = "wikipedia"  # 검색 소스: "wikipedia" 또는 "gemini"
         self.local_model = "llama3.2"  # Local 모델 이름
         self.retriever = WikipediaRetriever()
