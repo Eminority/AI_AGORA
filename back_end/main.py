@@ -11,12 +11,12 @@ from debate.participants import ParticipantFactory
 from debate.debate import Debate
 from debate.debate_manager import DebateManager
 from groq import Groq
-
+from crawling import DebateDataProcessor
 
 if __name__ == "__main__":
 
     #MONGO_URI, DB_NAME 확인
-    load_dotenv()  # .env 파일 로드
+    load_dotenv(override=True)  # .env 파일 로드
 
     MONGO_URI = os.getenv("MONGO_URI")
     DB_NAME = os.getenv("DB_NAME")
@@ -33,14 +33,15 @@ if __name__ == "__main__":
     AI_API_KEY = json.loads(os.getenv("AI_API_KEY"))
     ai_factory = AI_Factory(AI_API_KEY)
 
+    debate_data_processor = DebateDataProcessor(api_keys=AI_API_KEY)
+
     # VectorStoreHandler 인스턴스 생성 (임베딩 모델 및 청크 설정은 필요에 따라 조정)
     vector_handler = VectorStoreHandler(chunk_size=500, chunk_overlap=50)
 
     #주제를 후에 입력받는다고 가정하고 작성.
     #토론 인스턴스 만들기
     participant_factory = ParticipantFactory(vector_handler,ai_factory)
-    debate = Debate(participant_factory=participant_factory, db_connection=db_connection)
-    debate_manager = DebateManager(participant_factory=participant_factory, db_connection=db_connection)
+    debate_manager = DebateManager(participant_factory=participant_factory, debate_data_processor=debate_data_processor,db_connection=db_connection)
     ###############################임시로 입력받는 테스트 코드
 
     ####임시 사용자

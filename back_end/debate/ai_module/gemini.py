@@ -8,7 +8,7 @@ class GeminiAPI(AI_Instance):
         """
         #super().__init__()에서 해결
         #self.api_key = api_key
-        super().__init__(self, api_key=api_key)
+        super().__init__(self,api_key=api_key)
         genai.configure(api_key=self.api_key)
         self.model = genai.GenerativeModel('gemini-2.0-flash') #모델 변경 pro -> 2.0-flash
         self.personality = "" #기본 성격
@@ -69,7 +69,7 @@ class GeminiAPI(AI_Instance):
                 context = "\n".join([doc.page_content for doc in search_results])
 
         except Exception as e:
-            print(f"⚠️ 벡터스토어 검색 실패: {e}")
+            print(f"벡터스토어 검색 실패: {e}")
 
 
         full_prompt = ""
