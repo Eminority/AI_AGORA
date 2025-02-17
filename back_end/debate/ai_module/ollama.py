@@ -3,14 +3,28 @@ import requests
 import subprocess
 from langchain_ollama import ChatOllama
 from langchain_core.messages import SystemMessage, HumanMessage
-
-class OllamaRunner:
+from .ai_instance import AI_Instance
+class OllamaRunner(AI_Instance):
     def __init__(self, model_name : str, personality : str, role : str, base_url="http://localhost:11434"):
-        self.model_name = model_name
+        
+        #super().__init__()에서 해결
+        # self.model_name = model_name
+        # self.personality = personality
+        super().__init__(self, model_name=model_name, personality=personality)
         self.base_url = base_url
         self.model_installed = False  # 모델 다운로드 상태를 추적하는 변수
-        self.personality = personality
         self.role = role
+
+    
+    def set_personality(self, personality_text: str):
+        """
+        시스템 역할(지침)을 설정하여 모든 프롬프트에 선행하는 텍스트로 사용합니다.
+
+        :param personality_text: 시스템 역할 또는 지침 텍스트
+        """
+        self.personality = personality_text
+        print("시스템 역할이 설정되었습니다.")
+        
 
     def is_model_installed(self):
         """현재 설치된 Ollama 모델 목록을 확인하여 해당 모델이 있는지 검사"""

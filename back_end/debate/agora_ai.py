@@ -1,5 +1,6 @@
 from vectorstore_module import VectorStoreHandler
 from crawler_summary import DebateDataProcessor
+from .ai_module.ai_instance import AI_Instance
 # participant 또는 심판으로 들어갈 ai
 class Agora_AI:
     """
@@ -7,7 +8,7 @@ class Agora_AI:
     관리하는 클래스.
     """
 
-    def __init__(self, ai_type: str, ai_instance, personality:str="", vector_handler: VectorStoreHandler = None):
+    def __init__(self, ai_type: str, ai_instance:AI_Instance, personality:str="", vector_handler: VectorStoreHandler = None):
         """
         Args:
             ai_type (str): AI 모델 타입 (예: 'GEMINI', 'ollama' 등).
@@ -22,7 +23,7 @@ class Agora_AI:
         self.vectorstore = None
         self.crawled_data = []
         self.debate_processor = DebateDataProcessor()
-        # self.set_personality()
+        self.set_personality()
 
     def set_personality(self):
         if self.ai_instance:

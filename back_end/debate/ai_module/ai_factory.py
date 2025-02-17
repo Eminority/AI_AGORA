@@ -1,6 +1,7 @@
 from .gemini import GeminiAPI
 from .ollama import OllamaRunner
 from .groq import GroqAPI
+from .ai_instance import AI_Instance
 class AI_Factory:
     def __init__(self, api_keys:dict):
         """
@@ -10,7 +11,7 @@ class AI_Factory:
         self.api = api_keys
         print(self.api)
 
-    def create_ai_instance(self, ai_type: str):
+    def create_ai_instance(self, ai_type: str) -> AI_Instance:
         
         #로컬 기반 모델
         #ollma - mixtral 로컬 보델

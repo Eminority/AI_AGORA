@@ -128,7 +128,12 @@ def object_detect(file: UploadFile = File(...)):
     result_data = {"result":local_image_data.get("result")}
     if result_data["result"]:
         detect_data = yoloDetector.detect_objects(local_image_data["data"])
-        result_data["data"] = image_manager.crop_image(local_image_data["data"], detect_data)
+        if detect_data:
+            result_data["detected"] = True
+            result_data["data"] = image_manager.crop_image(local_image_data["data"], detect_data)
+        else:
+            result_data["detected"] = False
+            result_data["data"] = {local_image_data.get("result"), "default_image"}
     return result_data
 
 

@@ -1,7 +1,7 @@
 import requests
 from groq import Groq
-
-class GroqAPI:
+from .ai_instance import AI_Instance
+class GroqAPI(AI_Instance):
     def __init__(self, api_key: str, model_name: str = "default-model"):
         """
         GroqAPI 인스턴스를 초기화합니다.
@@ -9,9 +9,11 @@ class GroqAPI:
         :param api_key: Groq API 인증키
         :param model_name: 기본으로 사용할 모델 ID (예: 'model_name_small', 'model_name_large' 등)
         """
-        self.api_key = api_key
+        #super.__init__에서 해결 
+        # self.api_key = api_key
+        # self.model_name = model_name
+        super().__init__(self, api_key=api_key, model_name=model_name)
         self.groq_client = Groq(api_key=api_key)
-        self.model_name = model_name
         self.personality = ""  # 기본 시스템 역할 (없으면 빈 문자열)
         # Groq API 엔드포인트 (실제 엔드포인트로 수정)
         self.headers = {
