@@ -41,7 +41,8 @@ class DebateDataProcessor:
             api_keys (dict): AI_Factory에서 전달된 API 키 딕셔너리
         """
         self.api_key = api_keys.get("GSE")  # AI_Factory에서 전달받은 값 사용
-
+        self.max_results = max_results
+        self.headless = headless
         if not self.api_key:
             raise KeyError("환경 변수에서 'GSE' 키를 찾을 수 없습니다. .env 파일을 확인하세요.")
 
@@ -51,8 +52,9 @@ class DebateDataProcessor:
 
         print(f"✅ Google Custom Search API 키 로드 완료: {self.api_key}")
         print(f"✅ Google Custom Search CX ID 로드 완료: {self.cx}")
+        self.driver = self._init_driver()
 
-    def _init_driver(self, headless):
+    def _init_driver(self):
         """
         Selenium WebDriver 초기화.
 
@@ -63,7 +65,7 @@ class DebateDataProcessor:
             webdriver.Chrome: 설정된 WebDriver 인스턴스.
         """
         options = webdriver.ChromeOptions()
-        if headless:
+        if self.headless:
             options.add_argument("--headless")  # 창 없이 실행
         options.add_argument("--disable-gpu")
         options.add_argument("--no-sandbox")
@@ -172,7 +174,7 @@ class DebateDataProcessor:
         Returns:
             list: 기사 본문 리스트.
         """
-        num_articles = num_articles or self.max_results
+        num_articles = num_articles if num_articles else self.max_results
         article_links = self.search_articles(topic)
 
         articles_data = []

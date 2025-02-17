@@ -10,7 +10,7 @@ class OllamaRunner(AI_Instance):
         #super().__init__()에서 해결
         # self.model_name = model_name
         # self.personality = personality
-        super().__init__(self, model_name=model_name, personality=personality)
+        super().__init__(model_name=model_name, personality=personality)
         self.base_url = base_url
         self.model_installed = False  # 모델 다운로드 상태를 추적하는 변수
         self.role = role
