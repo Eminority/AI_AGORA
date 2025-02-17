@@ -1,19 +1,14 @@
 from vectorstore_module import VectorStoreHandler
-from crawler_summary import DebateDataProcessor
+from crawling import DebateDataProcessor
 # participant 또는 심판으로 들어갈 ai
 class Agora_AI:
-    """
-    다양한 AI 모델 및 벡터 스토어를 활용해 토론(크롤링, 임베딩, 텍스트 생성)을
-    관리하는 클래스.
-    """
-
     def __init__(self, ai_type: str, ai_instance, personality:str="", vector_handler: VectorStoreHandler = None):
         """
         Args:
             ai_type (str): AI 모델 타입 (예: 'GEMINI', 'ollama' 등).
             ai_instance: 실제 AI 모델 인스턴스(또는 API를 감싸는 래퍼).
-            vector_handler (VectorStoreHandler, optional): 벡터 스토어 핸들러. 
-                지정하지 않으면 기본 VectorStoreHandler 인스턴스를 사용.
+            api_keys (dict): AI_Factory에서 관리하는 API 키 딕셔너리.
+            vector_handler (VectorStoreHandler, optional): 벡터 스토어 핸들러.
         """
         self.ai_type = ai_type
         self.ai_instance = ai_instance
@@ -21,8 +16,11 @@ class Agora_AI:
         self.personality = personality
         self.vectorstore = None
         self.crawled_data = []
-        self.debate_processor = DebateDataProcessor()
-        # self.set_personality()
+
+        # API 키를 직접 로드하는 것이 아니라, AI_Factory에서 전달된 값을 사용
+        # self.debate_processor = DebateDataProcessor()
+
+        self.set_personality()
 
     def set_personality(self):
         if self.ai_instance:
@@ -30,14 +28,14 @@ class Agora_AI:
 
 
 
-    def crawling(self, topic: str):
+    def crawling(self, debate_processor:DebateDataProcessor, topic: str):
         """
         주제를 검색하여 기사를 크롤링하고, 결과를 벡터 스토어에 저장한다.
 
         Args:
             topic (str): 검색할 토론 주제
         """
-        articles = self.debate_processor.get_articles(topic)
+        articles = debate_processor.get_articles(topic)
         if not articles:
             print("❌ 크롤링된 데이터가 없습니다.")
             return

@@ -1,32 +1,56 @@
 import time
 import random
 import requests
+import os
+import json
+from dotenv import load_dotenv  # 환경 변수 로드
 from bs4 import BeautifulSoup
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
 
+# .env 파일 로드
+load_dotenv()
+
+def load_api_keys():
+    """
+    환경 변수에서 AI API 키를 로드하는 공통 함수.
+    """
+    api_key_json = json.loads(os.getenv("AI_API_KEY"))
+    
+    # 환경 변수 값 출력 (디버깅용)
+    print(f"🔍 [DEBUG] AI_API_KEY 환경 변수 값: {api_key_json}")
+
+    if api_key_json:
+        try:
+            api_keys = api_key_json  # JSON 변환
+            print(f"✅ [DEBUG] 변환된 API 키 딕셔너리: {api_keys}")  # 디버깅 출력
+            return api_keys
+        except json.JSONDecodeError:
+            raise ValueError("환경 변수 'AI_API_KEY'가 올바른 JSON 형식이 아닙니다. .env 파일을 확인하세요.")
+    else:
+        raise ValueError("환경 변수 'AI_API_KEY'가 설정되지 않았습니다.")
 
 class DebateDataProcessor:
-    """
-    Google Custom Search API를 이용해 뉴스 기사 링크를 검색하고, Selenium으로 기사 본문을 크롤링하는 클래스.
-    """
-
-    def __init__(self, api_key, cx, max_results=5, headless=True):
+    def __init__(self, api_keys: dict, max_results=5, headless=True):
         """
         초기화 메서드.
-
+        
         Args:
-            api_key (str): Google Custom Search API 키.
-            cx (str): 맞춤 검색 엔진 ID (뉴스 사이트만 포함).
-            max_results (int): 검색 결과에서 가져올 기사 수.
-            headless (bool): 브라우저 창을 표시할지 여부.
+            api_keys (dict): AI_Factory에서 전달된 API 키 딕셔너리
         """
-        self.api_key = api_key
-        self.cx = cx
-        self.max_results = max_results
-        self.driver = self._init_driver(headless)
+        self.api_key = api_keys.get("GSE")  # AI_Factory에서 전달받은 값 사용
+
+        if not self.api_key:
+            raise KeyError("환경 변수에서 'GSE' 키를 찾을 수 없습니다. .env 파일을 확인하세요.")
+
+        self.cx = os.getenv("CX")
+        if not self.cx:
+            raise ValueError("환경 변수에서 'CX' 값을 찾을 수 없습니다. .env 파일을 확인하세요.")
+
+        print(f"✅ Google Custom Search API 키 로드 완료: {self.api_key}")
+        print(f"✅ Google Custom Search CX ID 로드 완료: {self.cx}")
 
     def _init_driver(self, headless):
         """
@@ -83,7 +107,7 @@ class DebateDataProcessor:
             str: 실제 기사 URL.
         """
         try:
-            time.sleep(random.uniform(1, 3))  # 최소한의 대기시간 적용
+            time.sleep(random.uniform(1, 2))  # 최소한의 대기시간 적용
             article_link_element = self.driver.find_element(By.TAG_NAME, "a")  # 첫 번째 링크 찾기
             real_url = article_link_element.get_attribute("href")  # 실제 기사 URL 가져오기
             return real_url
@@ -109,7 +133,7 @@ class DebateDataProcessor:
             real_url = self._extract_real_url()
             if real_url:
                 self.driver.get(real_url)  # 실제 기사 URL로 이동
-                time.sleep(random.uniform(1, 3))  # 기사 페이지 로딩 대기 시간 최적화
+                time.sleep(random.uniform(1, 2))  # 기사 페이지 로딩 대기 시간 최적화
 
         # 스크롤을 내려서 모든 콘텐츠가 로딩되도록 함
         self._scroll_down()
@@ -130,7 +154,7 @@ class DebateDataProcessor:
 
         for _ in range(3):  # 스크롤 횟수 줄이기
             self.driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-            time.sleep(random.uniform(1, 3))  # 랜덤 대기
+            time.sleep(random.uniform(1, 2))  # 랜덤 대기
             new_height = self.driver.execute_script("return document.body.scrollHeight")
 
             if new_height == last_height:
@@ -169,10 +193,7 @@ class DebateDataProcessor:
 
 # 실행 예시
 if __name__ == "__main__":
-    API_KEY = "YOUR_GOOGLE_API_KEY"  # Google Custom Search API 키 입력
-    CX = "YOUR_CX_ID"  # 뉴스 사이트만 포함된 Google 맞춤 검색 엔진 ID
-
-    processor = DebateDataProcessor(API_KEY, CX, max_results=3, headless=True)
+    processor = DebateDataProcessor(max_results=3, headless=True)
     topic = "AI technology"
     
     articles = processor.get_articles(topic)
