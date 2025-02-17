@@ -10,6 +10,7 @@ from debate.ai_module.ai_factory import AI_Factory
 from debate.participants import ParticipantFactory 
 from debate.debate import Debate
 from debate.debate_manager import DebateManager
+from groq import Groq
 
 
 if __name__ == "__main__":
@@ -22,6 +23,7 @@ if __name__ == "__main__":
 
     for var_name, var_value in [("MONGO_URI", MONGO_URI),
                                 ("DB_NAME", DB_NAME)]:
+        
         if not var_value:
             raise ValueError(f"{var_name}가 .env파일에 설정되어있지 않습니다.")
      # MongoDB 연결 생성
@@ -49,7 +51,7 @@ if __name__ == "__main__":
         "_id": "67ac1d198f64bb663ade93b3",
         "name": "clock",
         "ai" : "GEMINI",
-        "object_attribute": "Out of control, out of control, very angry speach tone",
+        "object_attribute": "Precise and reliable",
         "create_time":  "2025-02-12T04:01:29.651Z",
         "img":None
         }

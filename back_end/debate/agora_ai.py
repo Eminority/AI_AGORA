@@ -98,5 +98,31 @@ class Agora_AI:
             return self.ai_instance.generate_text_with_vectorstore(prompt, self.vectorstore, k=k, max_tokens=max_tokens)
         elif self.ai_type.lower() == "ollama":
             return self.ai_instance.generate_text_with_vectorstore(prompt, self.vectorstore, k=k, max_tokens=max_tokens)
+        elif self.ai_type.lower() == "deepseek-r1-distill-llama-70b":
+            return self.ai_instance.generate_text_with_vectorstore(prompt, self.vectorstore, k=k, max_tokens=max_tokens)
+        elif self.ai_type.lower() == "deepseek-r1-distill-qwen-32b":
+            return self.ai_instance.generate_text_with_vectorstore(prompt, self.vectorstore, k=k, max_tokens=max_tokens)
+        elif self.ai_type.lower() == "gemma2-9b-it":
+            return self.ai_instance.generate_text_with_vectorstore(prompt, self.vectorstore, k=k, max_tokens=max_tokens)
+        elif self.ai_type.lower() == "llama-3.1-8b-instant":
+            return self.ai_instance.generate_text_with_vectorstore(prompt, self.vectorstore, k=k, max_tokens=max_tokens)
+        elif self.ai_type.lower() == "llama-3.2-1b-preview":
+            return self.ai_instance.generate_text_with_vectorstore(prompt, self.vectorstore, k=k, max_tokens=max_tokens)
+        elif self.ai_type.lower() == "llama-3.2-3b-preview":
+            return self.ai_instance.generate_text_with_vectorstore(prompt, self.vectorstore, k=k, max_tokens=max_tokens)
+        elif self.ai_type.lower() == "llama-3.3-70b-specdec":
+            return self.ai_instance.generate_text_with_vectorstore(prompt, self.vectorstore, k=k, max_tokens=max_tokens)
+        elif self.ai_type.lower() == "llama-3.3-70b-versatile":
+            return self.ai_instance.generate_text_with_vectorstore(prompt, self.vectorstore, k=k, max_tokens=max_tokens)
+        elif self.ai_type.lower() == "llama3-70b-8192":
+            return self.ai_instance.generate_text_with_vectorstore(prompt, self.vectorstore, k=k, max_tokens=max_tokens)
+        elif self.ai_type.lower() == "llama3-8b-8192":
+            return self.ai_instance.generate_text_with_vectorstore(prompt, self.vectorstore, k=k, max_tokens=max_tokens)
+        elif self.ai_type.lower() == "mixtral-8x7b-32768":
+            return self.ai_instance.generate_text_with_vectorstore(prompt, self.vectorstore, k=k, max_tokens=max_tokens)
+        elif self.ai_type.lower() == "qwen-2.5-32b":
+            return self.ai_instance.generate_text_with_vectorstore(prompt, self.vectorstore, k=k, max_tokens=max_tokens)
+        elif self.ai_type.lower() == "qwen-2.5-coder-32b":
+            return self.ai_instance.generate_text_with_vectorstore(prompt, self.vectorstore, k=k, max_tokens=max_tokens)
         else:
             return "등록된 형태의 AI가 아닙니다."

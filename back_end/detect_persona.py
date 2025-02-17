@@ -16,12 +16,15 @@ class DetectPersona:
 
     def __init__(self, db_connection, AI_API_KEY=None):
         self.db = db_connection  
-        self.source = None  # 검색 소스: "wikipedia" 또는 "gemini"
-        self.local_model = None  # Local 모델 이름
+        self.source = "wikipedia"  # 검색 소스: "wikipedia" 또는 "gemini"
+        self.local_model = "llama3.2"  # Local 모델 이름
         self.retriever = WikipediaRetriever()
-        self.gemini_model = None
-        self.local_llm = None
 
+        # try:
+        #     self.local_llm = ChatOllama(model=self.local_model)
+        #     print(f"✅ Local 모델이 '{self.local_model}'으로 설정되었습니다.")
+        # except Exception as e:
+        #     print(f"{self.local_model} 을 찾을 수 없습니다. \n {e}")
         # GEMINI API 설정
         if AI_API_KEY:
             genai.configure(api_key=AI_API_KEY)

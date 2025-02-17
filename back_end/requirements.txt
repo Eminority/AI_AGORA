@@ -5,6 +5,7 @@ langchain
 faiss-cpu
 sentence-transformers
 rank-bm25
+langchain-ollama
 langchain-community
 langchain-huggingface
 fastapi
@@ -12,7 +13,6 @@ uvicorn
 ollama
 python-multipart
 selenium
-beautifulsoup4
 webdriver-manager
 <<<<<<< HEAD
 ultralytics

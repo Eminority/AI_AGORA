@@ -10,6 +10,8 @@ from vectorstore_module import VectorStoreHandler
 from ai_profile.ai_profile import ProfileManager
 from yolo_detect import YOLODetect
 from image_manager import ImageManager
+from detect_persona import DetectPersona
+from debate.check_topic import CheckTopic
 # 환경 변수 로드
 load_dotenv()
 
@@ -45,23 +47,33 @@ real_image_save_path = os.path.join(os.getcwd(), IMAGE_SAVE_PATH)
 os.makedirs(real_image_save_path, exist_ok=True)
 image_manager = ImageManager(db=db_connection, img_path=real_image_save_path)
 
+#persona 생성기
+detect_persona = DetectPersona(db_connection=db_connection, AI_API_KEY=AI_API_KEY["GEMINI"])
+
 #프로필 관리 객체 생성
-profile_manager = ProfileManager(db=db_connection)
+profile_manager = ProfileManager(db=db_connection, persona_module=detect_persona)
 
 #토론 관리 인스턴스 생성
 debateManager = DebateManager(participant_factory=participant_factory, db_connection=db_connection)
+
+#토론 주제 확인 객체
+topic_checker = CheckTopic(AI_API_KEY["GEMINI"])
 
 # 토론 생성 API
 @app.post("/debate")
 def create_debate(pos_id: str = Form(...),
                   neg_id: str = Form(...),
                   topic: str = Form(...)):
-    pos = db_connection.select_data_from_id("object", pos_id)
-    neg = db_connection.select_data_from_id("object", neg_id)
+    
+    if topic_checker.checktopic(topic):
+        pos = db_connection.select_data_from_id("object", pos_id)
+        neg = db_connection.select_data_from_id("object", neg_id)
 
-    id = debateManager.create_debate(pos, neg, topic)
+        id = debateManager.create_debate(pos, neg, topic)
 
-    return {"message": "토론이 생성되었습니다.", "topic": topic, "id":id}
+        return {"result":True, "message": "토론이 생성되었습니다.", "topic": topic, "id":id}
+    else:
+        return {"result":False, "message": "토론 주제가 적절하지 않습니다."}
 
 # 토론 상태 확인 API
 @app.get("/debate/status")
@@ -80,8 +92,11 @@ def progress_debate(id:str= Form(...),
 # 토론 전체 받아오기
 @app.get("/debate/info")
 def get_debate_history(id:str = Query(..., description="토론 id")):
-    if debateManager.debatepool[id]:
-        return debateManager.debatepool[id].debate
+    if debateManager.debatepool.get(id):
+        debatedata = debateManager.debatepool[id].debate
+        debatedata["_id"] = str(debatedata["_id"])
+        print(debatedata)
+        return debatedata
     else:
         return []
 
@@ -118,17 +133,17 @@ def object_detect(file: UploadFile = File(...)):
 
 #최종적으로 이미지 포함 프로필 만들기
 @app.post("/profile/create")
-def create_ai_profile(name:str=Form(...),
-                      img:str=Form(...),
-                      ai:str=Form(...)):
-    result = image_manager.save_image_in_mongoDB_from_local(img)
-    if result.get("result") == "success":
+def create_ai_profile(name:str = Form(...),
+                      img:str = Form(...),
+                      ai:str = Form(...)):
+    save_result = image_manager.save_image_in_mongoDB_from_local(img)
+    if save_result.get("result") == "success":
         new_id = profile_manager.create_profile(name=name,
-                                    img=result["file_id"],
+                                    img=save_result["file_id"],
                                     ai=ai)
-        return {"result":"success", "id":new_id}
-    else:
-        return {"result":"error"}
+        if new_id.get("result"):
+            return {"result":"success", "id":new_id}
+    return {"result":"error"}
 
 ##실행코드
 # uvicorn backserver:app --host 0.0.0.0 --port 8000 --reload
