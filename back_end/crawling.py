@@ -172,13 +172,13 @@ if __name__ == "__main__":
     API_KEY = "YOUR_GOOGLE_API_KEY"  # Google Custom Search API 키 입력
     CX = "YOUR_CX_ID"  # 뉴스 사이트만 포함된 Google 맞춤 검색 엔진 ID
 
-    processor = DebateDataProcessor(API_KEY, CX, max_results=3, headless=False)
+    processor = DebateDataProcessor(API_KEY, CX, max_results=3, headless=True)
     topic = "AI technology"
     
     articles = processor.get_articles(topic)
 
     # 결과 출력
     for idx, article in enumerate(articles, 1):
-        print(f"기사 {idx}:\n{article['content'][:500]}...\n")  # 500자까지만 미리보기 출력
+        print(f"기사 {idx}:\n{article['content']}...\n")  
 
     processor.quit_driver()
