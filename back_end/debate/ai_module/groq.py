@@ -12,7 +12,7 @@ class GroqAPI(AI_Instance):
         #super.__init__에서 해결 
         # self.api_key = api_key
         # self.model_name = model_name
-        super().__init__(self, api_key=api_key, model_name=model_name)
+        super().__init__(api_key=api_key, model_name=model_name)
         self.groq_client = Groq(api_key=api_key)
         self.personality = ""  # 기본 시스템 역할 (없으면 빈 문자열)
         # Groq API 엔드포인트 (실제 엔드포인트로 수정)

@@ -8,7 +8,7 @@ class GeminiAPI(AI_Instance):
         """
         #super().__init__()에서 해결
         #self.api_key = api_key
-        super().__init__(self,api_key=api_key)
+        super().__init__(api_key=api_key)
         genai.configure(api_key=self.api_key)
         self.model = genai.GenerativeModel('gemini-2.0-flash') #모델 변경 pro -> 2.0-flash
         self.personality = "" #기본 성격
