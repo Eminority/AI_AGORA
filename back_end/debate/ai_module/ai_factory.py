@@ -1,6 +1,7 @@
 from .gemini import GeminiAPI
 from .ollama import OllamaRunner
 from .groq import GroqAPI
+
 class AI_Factory:
     def __init__(self, api_keys: dict):
         """
@@ -58,7 +59,7 @@ class AI_Factory:
         # Gemini API 모델
         if ai_type == "GEMINI":
             if "GEMINI" in self.api:
-                return GeminiAPI(self.api["GEMINI"])
+                return GeminiAPI(api_key=self.api["GEMINI"])
             else:
                 print("GEMINI API 키가 제공되지 않았습니다.")
                 return None
