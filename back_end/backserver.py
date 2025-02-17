@@ -48,7 +48,7 @@ os.makedirs(real_image_save_path, exist_ok=True)
 image_manager = ImageManager(db=db_connection, img_path=real_image_save_path)
 
 #persona 생성기
-detect_persona = DetectPersona(db_connection=db_connection, AI_API_KEY=AI_API_KEY["GEMINI"])
+detect_persona = DetectPersona(AI_API_KEY=AI_API_KEY["GEMINI"])
 
 #프로필 관리 객체 생성
 profile_manager = ProfileManager(db=db_connection, persona_module=detect_persona)
