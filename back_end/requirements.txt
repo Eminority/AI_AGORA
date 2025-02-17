@@ -18,3 +18,5 @@ ultralytics
 langchain_google_genai
 wikipedia
 ultralytics
+google
+googlesearch-python

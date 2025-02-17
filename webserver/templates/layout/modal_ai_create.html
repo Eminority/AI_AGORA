@@ -6,8 +6,8 @@
             <button type="button" class="close" data-dismiss="modal">&times;</button>
         </div>
         <!-- ai create modal body -->
-        <div class="modal-body">
-            <div>
+        <div class="modal-body ">
+            <div class="form-group">
                 <form id="yoloDetectForm"  method="post" enctype="multipart/formdata" data-object-detect-url = "{{ request.url_for('list_from_object_detect') }}">
                     <div class="container">
                         <label class="custom-file-label" for="original_image">이미지 넣기</label>
@@ -18,24 +18,19 @@
                     </div>
                 </form>
             </div>
-            <div id="generateAI_area" style="display: none;">
+            <div id="generateAI_area" class="form-group" style="display: none;">
                 <form id="ImageSelectedForm" method="post" enctype="multipart/formdata" data-create-profile-url = "{{ request.url_for('create_profile') }}">
                     <div>
                         <p>탐지된 객체 목록</p>
                         <div id="detected-list"></div>
                     </div>
                     <div>
-                        <p>사용할 AI</p>
-                        <div id="ai-list">
-                            <label>
-                                <input type="radio" name="ai" value="GEMINI" checked /> GEMINI
-                            </label>
-                            <label>
-                                <input type="radio" name="ai" value="" /> Test1
-                            </label>
-                            <label>
-                                <input type="radio" name="ai" value=""  /> Test2
-                            </label>
+                        <div id="ai-list" class="custom-radio">
+                            <label for="ai">사용할 AI</label>
+                            <select class="custom-select" id="ai" name="ai">
+                                <option value="GEMINI" checked>GEMINI</option>
+                                <option value="TEST">test</option>
+                            </select>
                         </div>
                     </div>
                     <button type="submit">설정 완료</button>

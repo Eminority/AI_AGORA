@@ -13,8 +13,8 @@ class Agora_AI:
         Args:
             ai_type (str): AI 모델 타입 (예: 'GEMINI', 'ollama' 등).
             ai_instance: 실제 AI 모델 인스턴스(또는 API를 감싸는 래퍼).
-            vector_handler (VectorStoreHandler, optional): 벡터 스토어 핸들러. 
-                지정하지 않으면 기본 VectorStoreHandler 인스턴스를 사용.
+            api_keys (dict): AI_Factory에서 관리하는 API 키 딕셔너리.
+            vector_handler (VectorStoreHandler, optional): 벡터 스토어 핸들러.
         """
         self.ai_type = ai_type
         self.ai_instance = ai_instance
@@ -31,14 +31,14 @@ class Agora_AI:
 
 
 
-    def crawling(self, topic: str):
+    def crawling(self, debate_processor:DebateDataProcessor, topic: str):
         """
         주제를 검색하여 기사를 크롤링하고, 결과를 벡터 스토어에 저장한다.
 
         Args:
             topic (str): 검색할 토론 주제
         """
-        articles = self.debate_processor.get_articles(topic)
+        articles = debate_processor.get_articles(topic)
         if not articles:
             print("❌ 크롤링된 데이터가 없습니다.")
             return

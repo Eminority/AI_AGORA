@@ -5,15 +5,17 @@ from db_module import MongoDBConnection
 from .participants import ParticipantFactory
 from .agora_ai import Agora_AI
 from vectorstore_module import VectorStoreHandler
+from crawling import DebateDataProcessor
 import re
 
 class Debate:
-    def __init__(self, participant_factory: ParticipantFactory, db_connection: MongoDBConnection):
+    def __init__(self, participant_factory: ParticipantFactory, debate_data_processor:DebateDataProcessor, db_connection: MongoDBConnection):
         self.judge = None
         self.pos = None
         self.neg = None
         self.db_connection = db_connection
         self.participant_factory = participant_factory
+        self.debate_data_processor = debate_data_processor
 
         # debate 필드 초기화
         self.debate = {
@@ -114,9 +116,18 @@ class Debate:
             result["speaker"] = "judge"
             result["message"] = self.judge.generate_text(
                 f"""
-                You are the judge of this debate. Your role is to introduce the topic and set the stage for a structured discussion.
-                Topic: {self.debate['topic']}
-                Briefly explain the topic and instruct the participants to begin their arguments.
+                You are the judge of this debate. Your responsibility is to fairly evaluate the arguments based on logic, clarity, and evidence.  
+                Your first task is to introduce the debate topic, explain its significance, and set the rules for a structured discussion.  
+                Clearly instruct the participants on their roles and expectations.
+
+                **Response format:**  
+                - **Introduction:** Provide a brief explanation of the debate topic and its relevance.  
+                - **Rules:** Outline the debate structure (each side presents arguments, rebuttals, and a conclusion).  
+                - **Expectations:** Remind participants to use logical reasoning, evidence, and counterpoints in their responses.  
+                - **Opening Statement Prompt:** Ask the affirmative side to begin.  
+
+                **Debate Topic:** {self.debate['topic']}
+
                 """
             )
         
@@ -125,10 +136,22 @@ class Debate:
             result["speaker"] = "pos"
             result["message"] = self.pos.answer(
                 f"""
-                You are the representative of the affirmative side in this debate. Your role is to defend the topic and provide strong supporting arguments.
-                Topic: {self.debate['topic']}
-                Last statement: {self.debate['debate_log'][-1]}
-                Present a compelling case with evidence, logical reasoning, and emphasize the benefits of this stance.
+                You are the representative of the affirmative side in this debate.  
+                Your role is to present a strong argument in favor of the topic using logical reasoning, evidence, and clear examples.
+
+                **Response format:**  
+                - **Claim:** Clearly state your main argument.  
+                - **Evidence:** Support your claim with at least one example, study, or logical explanation.  
+                - **Counterpoint Anticipation:** Predict a possible counterargument and preemptively address it.  
+
+                **Important Guidelines:**  
+                - Be structured and clear.  
+                - Reference previous statements when applicable.  
+                - Use persuasive language without unnecessary aggression.  
+
+                **Debate Topic:** {self.debate['topic']}  
+                **Previous Statement (if any):** {self.debate['debate_log'][-1] if self.debate['debate_log'] else "None"}  
+
                 """
             )
         
@@ -137,10 +160,21 @@ class Debate:
             result["speaker"] = "neg"
             result["message"] = self.neg.answer(
                 f"""
-                You are the representative of the opposing side in this debate. Your role is to challenge the topic and argue against it.
-                Topic: {self.debate['topic']}
-                Last statement: {self.debate['debate_log'][-2]}
-                Present a compelling case with evidence, logical reasoning, and emphasize the drawbacks or risks of this stance.
+                You are the representative of the opposing side in this debate.  
+                Your role is to critically challenge the topic by pointing out its weaknesses and potential risks.
+
+                **Response format:**  
+                - **Counterargument:** Identify a key flaw in the affirmative argument.  
+                - **Evidence:** Provide logical reasoning, examples, or counter-evidence to support your stance.  
+                - **Alternative Perspective:** Offer an alternative viewpoint that challenges the affirmative claim.  
+
+                **Important Guidelines:**  
+                - Ensure your argument directly responds to the affirmative side's points.  
+                - Be structured, logical, and persuasive.  
+                - Maintain a respectful and professional tone.  
+
+                **Debate Topic:** {self.debate['topic']}  
+                **Previous Statement (Affirmative Side's Argument):** {self.debate['debate_log'][-2]}  
                 """
             )
         
@@ -155,9 +189,16 @@ class Debate:
             result["speaker"] = "neg"
             result["message"] = self.neg.answer(
                 f"""
-                You are now delivering a rebuttal against the affirmative argument.
-                Last statement: {self.debate['debate_log'][-3]}
-                Critically analyze their points and provide counterarguments with logical reasoning.
+                You are now delivering a rebuttal against the opposing argument.  
+                Your task is to critically analyze their points and refute them with strong reasoning.
+
+                **Response format:**  
+                - **Restate the Opposing Argument:** Briefly summarize the previous statement.  
+                - **Critical Analysis:** Identify logical flaws, inconsistencies, or weaknesses.  
+                - **Counter-Rebuttal:** Strengthen your own argument by refuting their points with evidence or logic.  
+
+                **Debate Topic:** {self.debate['topic']}  
+                **Previous Statement (Opposing Side’s Argument):** {self.debate['debate_log'][-3]}  
                 """
             )
         
@@ -166,9 +207,16 @@ class Debate:
             result["speaker"] = "pos"
             result["message"] = self.pos.answer(
                 f"""
-                You are now delivering a rebuttal against the opposing argument.
-                Last statement: {self.debate['debate_log'][-3]}
-                Refute their points and reinforce your stance with clear, logical reasoning.
+                You are now delivering a rebuttal against the opposing argument.  
+                Your task is to critically analyze their points and refute them with strong reasoning.
+
+                **Response format:**  
+                - **Restate the Opposing Argument:** Briefly summarize the previous statement.  
+                - **Critical Analysis:** Identify logical flaws, inconsistencies, or weaknesses.  
+                - **Counter-Rebuttal:** Strengthen your own argument by refuting their points with evidence or logic.  
+
+                **Debate Topic:** {self.debate['topic']}  
+                **Previous Statement (Opposing Side’s Argument):** {self.debate['debate_log'][-3]}  
                 """
             )
         
@@ -183,9 +231,16 @@ class Debate:
             result["speaker"] = "pos"
             result["message"] = self.pos.answer(
                 f"""
-                You are presenting the final conclusion for the affirmative side.
-                Last statements: {self.debate['debate_log'][:-2]}
-                Summarize your key arguments and leave a strong closing statement.
+                You are presenting the final conclusion for the affirmative side.  
+                Your role is to reinforce your strongest points and deliver a compelling closing argument.
+
+                **Response format:**  
+                - **Key Argument Recap:** Summarize your main arguments in a concise manner.  
+                - **Impact Statement:** Explain why your argument is more convincing than the opposing side.  
+                - **Final Persuasive Appeal:** Deliver a strong closing remark that leaves a lasting impression.  
+
+                **Debate Topic:** {self.debate['topic']}  
+                **Previous Statements:** {self.debate['debate_log'][:-2]}  
                 """
             )
         
@@ -194,9 +249,16 @@ class Debate:
             result["speaker"] = "neg"
             result["message"] = self.neg.answer(
                 f"""
-                You are presenting the final conclusion for the opposing side.
-                Last statements: {self.debate['debate_log'][:-3]}
-                Summarize your key arguments and leave a strong closing statement.
+                You are presenting the final conclusion for the opposing side.  
+                Your role is to reinforce your stance and demonstrate why your argument is stronger.
+
+                **Response format:**  
+                - **Key Counterarguments Recap:** Summarize the most critical flaws in the affirmative argument.  
+                - **Logical Strength:** Explain why your stance holds more weight.  
+                - **Final Takeaway:** End with a strong statement that supports your side’s victory.  
+
+                **Debate Topic:** {self.debate['topic']}  
+                **Previous Statements:** {self.debate['debate_log'][:-4]}  
                 """
             )
         
@@ -240,26 +302,26 @@ class Debate:
         
         if self.pos and hasattr(self.pos, 'agora_ai'):
             print("[INFO] POS 측에서 크롤링을 실행합니다.")
-            self.pos.agora_ai.crawling(topic)
+            self.pos.agora_ai.crawling(debate_processor=self.debate_data_processor,topic=topic)
             shared_crawled_data = self.pos.agora_ai.crawled_data
             shared_vectorstore = self.pos.agora_ai.vectorstore
 
         elif self.neg and hasattr(self.neg, 'agora_ai'):
             print("[INFO] NEG 측에서 크롤링을 실행합니다.")
-            self.neg.agora_ai.crawling(topic)
+            self.neg.agora_ai.crawling(debate_processor=self.debate_data_processor,topic=topic)
             shared_crawled_data = self.neg.agora_ai.crawled_data
             shared_vectorstore = self.neg.agora_ai.vectorstore
 
         elif self.judge:
             if hasattr(self.judge, 'agora_ai'):
                 print("[INFO] JUDGE 측(agora_ai 있음)에서 크롤링을 실행합니다.")
-                self.judge.agora_ai.crawling(topic)
+                self.judge.agora_ai.crawling(debate_processor=self.debate_data_processor,topic=topic)
                 shared_crawled_data = self.judge.agora_ai.crawled_data
                 shared_vectorstore = self.judge.agora_ai.vectorstore
             else:
                 print("[INFO] JUDGE 측에서 크롤링을 실행합니다.")
                 if hasattr(self.judge, 'crawling'):
-                    self.judge.crawling(topic)
+                    self.judge.crawling(debate_processor=self.debate_data_processor,topic=topic)
                 # getattr를 사용해 속성이 없으면 None을 기본값으로 사용
                 shared_crawled_data = getattr(self.judge, 'crawled_data', None)
                 shared_vectorstore = getattr(self.judge, 'vectorstore', None)
@@ -299,10 +361,31 @@ class Debate:
     def evaluate(self):
         # Generate the evaluation text from the judge
         result_text = self.judge.generate_text(
-            f"Statement: {self.debate['debate_log']}\n\n"
-            "Evaluate the logical strength of both the Pro and Con sides on a scale totaling 100 points, ensuring that the Pro score and Con score sum to 100. "
-            "For example, if the Pro side scores 65, then the Con side should score 35. "
-            "Please conclude your answer with the final score in the following format: 'Final Score - Pro: X'."
+            f"""Statement: {self.debate['debate_log']}\n\n
+            You are the judge of this debate.  
+            Your responsibility is to objectively evaluate both sides based on logical strength, clarity, and evidence.
+
+            Your evaluation should follow a structured approach:  
+            1. **Summary of Arguments:** Summarize the strongest points from both sides.  
+            2. **Logical Evaluation:** Assess the reasoning, coherence, and effectiveness of each argument.  
+            3. **Evidence Strength:** Evaluate the credibility and relevance of supporting evidence.  
+            4. **Counterargument Handling:** Determine how well each side addressed the opposing arguments.  
+            5. **Final Verdict & Score:** Declare the winner and provide a final score (Pro vs. Con, summing to 100).  
+
+            **Response Format:**  
+            - **Summary:** [Summarize key points from both sides]  
+            - **Evaluation:** [Assess reasoning, evidence, and counterarguments]  
+            - **Final Verdict:** [Which side presented a stronger case and why]  
+            - **Score Breakdown:** "Final Score - Pro: X, Con: Y (Total: 100)"  
+
+            ---
+
+            ### **Debate Details**  
+            - **Topic:** {self.debate['topic']}  
+            - **Debate Log:** {self.debate['debate_log']}  
+
+            Now, analyze the debate and provide your verdict in the format specified above.
+            """
         )
 
         match = re.search(r'Final Score\s*-\s*Pro:\s*(\d+)', result_text)
