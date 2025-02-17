@@ -69,7 +69,7 @@ class GeminiAPI(AI_Instance):
                 context = "\n".join([doc.page_content for doc in search_results])
 
         except Exception as e:
-            print(f"⚠️ 벡터스토어 검색 실패: {e}")
+            print(f"벡터스토어 검색 실패: {e}")
 
 
         full_prompt = ""
