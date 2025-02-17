@@ -14,10 +14,8 @@ ollama
 python-multipart
 selenium
 webdriver-manager
-<<<<<<< HEAD
 ultralytics
 langchain_google_genai
 wikipedia
-=======
-ultralytics
->>>>>>> dev0
+google
+googlesearch-python
