@@ -137,9 +137,9 @@ class Debate:
                 f"""
                 "I firmly believe that {self.debate['topic']} is the right stance. 
 
-                One of the key reasons is [핵심 주장]. If we consider [증거 또는 사례], it becomes clear that [논리적 전개]. 
+                One of the key reasons is [a key argument]. If we consider [evidence or examples], it becomes clear that [logical development]. 
 
-                Some might argue otherwise, but those perspectives tend to overlook [반박에 대한 대응].
+                Some might argue otherwise, but those perspectives tend to overlook [response to counterarguments].
 
                 Given the evidence, supporting this position is the most rational choice."
 
@@ -155,11 +155,11 @@ class Debate:
                 f"""
                 "That was an interesting argument, but I must disagree.
 
-                The biggest issue with that perspective is [반박 논점]. When we examine [논리적 반례], it becomes clear that [반박 근거].
+                The biggest issue with that perspective is [counterargument]. When we examine [logical refutation], it becomes clear that [supporting evidence].
 
-                Additionally, [추가적인 논거].
+                Additionally, [further reasoning].
 
-                Their argument does not fully account for [취약점 지적], which is why this position is flawed."
+                Their argument does not fully account for [critical flaw], which is why this position is flawed."
 
                 **Debate Topic:** {self.debate['topic']}
                 **Previous Statements:** {self.debate['debate_log'][-2]}
@@ -179,9 +179,9 @@ class Debate:
                 f"""
                 "I've carefully considered the affirmative argument, but I must challenge it.
 
-                They argued that [상대 주장 요약], but this assumption fails to account for [논리적 반론].
+                They argued that [summary of the opposing argument], but this assumption fails to account for [logical refutation].
 
-                Furthermore, if we look at [증거 또는 사례], we see that [추가적인 근거].
+                Furthermore, if we look at [evidence or examples], we see that [additional supporting points].
 
                 For these reasons, their position is not as strong as it may seem."
 
@@ -197,9 +197,9 @@ class Debate:
                 f"""
                 "I appreciate that perspective, but there are key points that were overlooked.
 
-                The argument was made that [상대 주장 요약], but it fails to address [논리적 반론].
+                The argument was made that [summary of the opposing argument], but it fails to address [logical refutation].
 
-                Additionally, if we take into account [증거 또는 사례], we see that [추가적인 근거].
+                Additionally, if we take into account [evidence or examples], we see that [further supporting points].
 
                 This is why our stance remains the stronger one."
 
@@ -221,7 +221,7 @@ class Debate:
                 f"""
                 "Throughout this debate, we've demonstrated why {self.debate['topic']} is the correct position.
 
-                The most important takeaway is [핵심 주장 요약]. Even when challenged, our argument held strong because [결정적인 근거].
+                The most important takeaway is [a summary of the key argument]. Even when challenged, our argument held strong because [decisive supporting point].
 
                 Given the discussion we've had, it's evident that this stance is the most logical and justified."
 
@@ -237,7 +237,7 @@ class Debate:
                 f"""
                 "Let’s take a step back and look at the bigger picture.
 
-                The critical flaw in the affirmative argument was [핵심 반박 요약]. We’ve demonstrated that [주요 논거], and despite their responses, those weaknesses remain.
+                The critical flaw in the affirmative argument was [summary of key counterargument]. We’ve demonstrated that [main reasoning], and despite their responses, those weaknesses remain.
 
                 After carefully evaluating all points, it’s clear that this stance does not hold up."
 
@@ -245,12 +245,13 @@ class Debate:
                 **Previous Statements:** {self.debate['debate_log'][:-4]}
                 """
             )
-        
+
         elif step == 10:
             # 10. 판사가 판결 준비시간(1초) 부여
             result["speaker"] = "judge"
-            result["message"] = "The judge will now take 1 second to deliberate before making a final decision."
+            result["message"] = "The debate has now concluded. I will take a moment to review all arguments before making a final decision."
             time.sleep(1)
+
         
         elif step == 11:
             # 11. 판사가 최종 결론
