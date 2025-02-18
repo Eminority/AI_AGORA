@@ -1,5 +1,5 @@
 from vectorstore_module import VectorStoreHandler
-from crawler_summary import DebateDataProcessor
+from crawling import DebateDataProcessor
 from .ai_module.ai_instance import AI_Instance
 # participant 또는 심판으로 들어갈 ai
 class Agora_AI:
@@ -22,7 +22,11 @@ class Agora_AI:
         self.personality = personality
         self.vectorstore = None
         self.crawled_data = []
-        self.debate_processor = DebateDataProcessor()
+        
+
+        # API 키를 직접 로드하는 것이 아니라, AI_Factory에서 전달된 값을 사용
+        # self.debate_processor = DebateDataProcessor()
+
         self.set_personality()
 
     def set_personality(self):

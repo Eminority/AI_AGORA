@@ -44,13 +44,13 @@ document.addEventListener("DOMContentLoaded", function(){
     function generateRadioButtons(options) {
         Object.entries(options).forEach(([key, data], index) => {
             const label = document.createElement("label");
+            const container = document.getElementById("detected-list");
             label.innerHTML = `
                 <input type="radio" name="name" value="${data.name}" data-filename="${key}" required ${index === 0 ? "checked" : ""}>
                 ${data.name}
             `;
             container.appendChild(label);
             container.appendChild(document.createElement("br"));  // 줄바꿈
-            options_len++;
         });
         
     }

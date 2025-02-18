@@ -23,7 +23,7 @@ class ImageManager:
         with open(full_path, "rb") as image_file:
             encoded_string = base64.b64encode(image_file.read()).decode('utf-8')
 
-        image_data = {"filename" : f"{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}_{image_name}", "data": encoded_string}
+        image_data = {"filename" : f"{image_name}", "data": encoded_string}
         result = self.db.insert_data('image', image_data)
         return {"result":"success", "file_id": str(result)}
 

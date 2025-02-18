@@ -19,14 +19,12 @@ async function autoProgressDebate(debateId) {
             // 📌 AI 응답이 있으면 채팅창에 추가
             if (result.progress) {
                 addMessageToChat(result.progress.speaker, result.progress.timestamp, result.progress.message);
+                autoProgressDebate(debateId);
             } else if (result.message) {
                 console.log("AI 토론 종료 메시지 감지:", result.message);
                 break; // 📌 AI 진행 중단
             }
 
-
-            // 📌 일정 시간 대기 후 반복 실행
-            await new Promise(resolve => setTimeout(resolve, 2000));
 
         } catch (error) {
             console.error("AI 진행 실패:", error);

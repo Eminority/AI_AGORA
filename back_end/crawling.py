@@ -2,35 +2,11 @@ import time
 import random
 import requests
 import os
-import json
-from dotenv import load_dotenv  # 환경 변수 로드
 from bs4 import BeautifulSoup
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
-
-# .env 파일 로드
-load_dotenv()
-
-def load_api_keys():
-    """
-    환경 변수에서 AI API 키를 로드하는 공통 함수.
-    """
-    api_key_json = json.loads(os.getenv("AI_API_KEY"))
-    
-    # 환경 변수 값 출력 (디버깅용)
-    print(f"🔍 [DEBUG] AI_API_KEY 환경 변수 값: {api_key_json}")
-
-    if api_key_json:
-        try:
-            api_keys = api_key_json  # JSON 변환
-            print(f"✅ [DEBUG] 변환된 API 키 딕셔너리: {api_keys}")  # 디버깅 출력
-            return api_keys
-        except json.JSONDecodeError:
-            raise ValueError("환경 변수 'AI_API_KEY'가 올바른 JSON 형식이 아닙니다. .env 파일을 확인하세요.")
-    else:
-        raise ValueError("환경 변수 'AI_API_KEY'가 설정되지 않았습니다.")
 
 class DebateDataProcessor:
     def __init__(self, api_keys: dict, max_results=5, headless=True):

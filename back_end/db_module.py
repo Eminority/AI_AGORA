@@ -44,7 +44,11 @@ class MongoDBConnection:
 
     #RDBMS 쿼리문에서의 Update문을 대체.
     def update_data(self, collection_name: str, data:dict):
-        return self.db[collection_name].update_one({"_id":data["_id"]}, {"$set":data})
+        id = data.get("_id")
+        del data["_id"]
+        result = self.db[collection_name].update_one({"_id":ObjectId(id)}, {"$set":data})
+        data["_id"] = id
+        return result
 
     def close_connection(self):
         """
