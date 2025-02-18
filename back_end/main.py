@@ -53,9 +53,9 @@ if __name__ == "__main__":
     # user_ai = input("ai 설정 - 현재 가능한 AI : GEMINI // 입력  :")
     user = {
         "_id": "67ac1d198f64bb663ade93b3",
-        "name": "clock",
+        "name": "dog",
         "ai" : "GEMINI",
-        "object_attribute": "Precise and reliable",
+        "object_attribute": "Loyal, friendly, intelligent, protective, trainable, playful, energetic, adaptable, affectionate, independent",
         "create_time":  "2025-02-12T04:01:29.651Z",
         "img":None
         }

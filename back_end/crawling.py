@@ -8,7 +8,7 @@ from bs4 import BeautifulSoup
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.service import Service
-from webdriver_manager.chrome import ChromeDriverManager
+from webdriver_manager.chrome import ChromeDriverManager 
 
 # .env 파일 로드
 load_dotenv()
@@ -29,7 +29,7 @@ def load_api_keys():
         raise ValueError("환경 변수 'AI_API_KEY'가 설정되지 않았습니다.")
 
 class DebateDataProcessor:
-    def __init__(self, api_keys: dict, max_results=5, headless=True):
+    def __init__(self, api_keys: dict, max_results=5, headless=False):
         """
         초기화 메서드.
         
@@ -61,8 +61,9 @@ class DebateDataProcessor:
         options = webdriver.ChromeOptions()
         if self.headless:
             options.add_argument("--headless")  # 창 없이 실행
-        options.add_argument("--disable-gpu")
+        # options.add_argument("--disable-gpu")
         options.add_argument("--no-sandbox")
+        options.add_argument('--ignore-certificate-errors')
         options.add_argument("--disable-dev-shm-usage")
 
         service = Service(ChromeDriverManager().install())
@@ -176,7 +177,7 @@ class DebateDataProcessor:
             article_content = self._fetch_article_content(link)
             if article_content:
                 articles_data.append({"content": article_content})
-
+        print("크롤링이 실행되었습니다.")
         return articles_data
 
     def quit_driver(self):

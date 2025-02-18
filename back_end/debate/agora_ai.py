@@ -8,7 +8,7 @@ class Agora_AI:
         Args:
             ai_type (str): AI 모델 타입 (예: 'GEMINI', 'ollama' 등).
             ai_instance: 실제 AI 모델 인스턴스(또는 API를 감싸는 래퍼).
-            api_keys (dict): AI_Factory에서 관리하는 API 키 딕셔너리.
+            api_keys (dict): AI_Factory에서 관리하는 API 키 딕셔너리. 
             vector_handler (VectorStoreHandler, optional): 벡터 스토어 핸들러.
         """
         self.ai_type = ai_type
@@ -78,7 +78,7 @@ class Agora_AI:
         if self.vectorstore is None:
             raise ValueError("벡터스토어 생성에 실패했습니다.")
 
-    def generate_text(self, prompt: str, k: int = 3, max_tokens: int = 200):
+    def generate_text(self, prompt: str, k: int = 5, max_tokens: int = 400):
         """
         주어진 prompt와 벡터 스토어를 활용해 텍스트를 생성한다.
         

@@ -116,17 +116,23 @@ class Debate:
             result["speaker"] = "judge"
             result["message"] = self.judge.generate_text(
                 f"""
-                You are the judge overseeing this debate. Your role is to **guide the discussion neutrally**, ensuring that each side presents their argument logically and fairly.  
-                You do not take a stance or express personal opinions on the topic. Instead, you will facilitate the debate by introducing the topic, setting expectations, and moderating the discussion.
+                You are facilitating a debate on the topic: **"{self.debate['topic']}"**. Your role is to introduce the discussion in a neutral manner, providing a brief, informative introduction to the topic without taking any stance.  
 
-                The debate topic is: **{self.debate['topic']}**  
+                ### **Instructions:**
+                - Start by giving a **concise, objective summary** of the topic.
+                - Avoid personal opinions or taking a side.
+                - After introducing the topic, **invite the affirmative side to present their argument first**.
 
-                "Welcome, everyone. Today's discussion will challenge both sides to think critically and defend their viewpoints with clear reasoning and evidence.  
-                We will follow a structured format, with each side presenting their stance, responding to rebuttals, and concluding with final arguments."
+                ---
 
-                "To start, let's hear from the **affirmative side**. Please present your argument in support of the topic."
+                ### **Example Structure**:
 
-                **Debate Topic:** {self.debate['topic']}
+                **Introduction:**  
+                "{self.debate['topic']} is a widely debated issue with strong arguments on both sides. Supporters argue that  [Key argument of the affirmative side], while opponents believe that [Key argument of the negative side]. The discussion often revolves around factors such as [2-3 key points of debate]. Today, we will explore both perspectives in depth."
+
+                **Prompting the Affirmative Side:**  
+                "To begin, let's hear from the **affirmative side**. Please present your argument in support of {self.debate['topic']}. What are the key reasons and evidence supporting your stance?"
+
                 """
             )
 
@@ -134,36 +140,67 @@ class Debate:
             # 2. 찬성 측 주장
             result["speaker"] = "pos"
             result["message"] = self.pos.answer(
-                f"""
-                "I firmly believe that {self.debate['topic']} is the right stance. 
+            f"""
+            You are participating in a debate on the topic: **"{self.debate['topic']}"**. Your role is to argue in favor of this statement.  
 
-                One of the key reasons is [a key argument]. If we consider [evidence or examples], it becomes clear that [logical development]. 
+            ### **Instructions:**  
+            - Clearly state your **position** in support of the topic.  
+            - Provide **at least three strong arguments** supporting your stance.  
+            - Use **logical reasoning, real-world examples, and data** to reinforce your claims.  
+            - Avoid general descriptions of the topic—focus only on defending your position.  
 
-                Some might argue otherwise, but those perspectives tend to overlook [response to counterarguments].
+            ---
 
-                Given the evidence, supporting this position is the most rational choice."
+            ### **Your Response Format:**  
 
-                **Debate Topic:** {self.debate['topic']}
-                **Previous Statements:** {self.debate['debate_log'][-1]}
-                """
+            1. **Main Argument #1**  
+            - Explanation  
+            - Supporting Evidence or Example  
+
+            2. **Main Argument #2**  
+            - Explanation  
+            - Supporting Evidence or Example  
+
+            3. **Main Argument #3**  
+            - Explanation  
+            - Supporting Evidence or Example  
+
+            Be concise yet persuasive. Provide factual support where applicable.
+            """
             )
 
         elif step == 3:
             # 3. 반대 측 주장
             result["speaker"] = "neg"
             result["message"] = self.neg.answer(
-                f"""
-                "That was an interesting argument, but I must disagree.
+            f"""
+            You are participating in a debate on the topic: **"{self.debate['topic']}"**. Your role is to argue against this statement.  
 
-                The biggest issue with that perspective is [counterargument]. When we examine [logical refutation], it becomes clear that [supporting evidence].
+            ### **Instructions:**  
+            - Clearly state your **position** in opposition to the topic.  
+            - Provide **at least three strong arguments** against the proposition.  
+            - Use **logical reasoning, real-world examples, and data** to reinforce your claims.  
+            - Avoid general descriptions of the topic—focus only on presenting counterarguments.  
 
-                Additionally, [further reasoning].
+            ---
 
-                Their argument does not fully account for [critical flaw], which is why this position is flawed."
+            ### **Your Response Format:**  
 
-                **Debate Topic:** {self.debate['topic']}
-                **Previous Statements:** {self.debate['debate_log'][-2]}
-                """
+            1. **Counterargument #1**  
+            - Explanation  
+            - Supporting Evidence or Example  
+
+            2. **Counterargument #2**  
+            - Explanation  
+            - Supporting Evidence or Example  
+
+            3. **Counterargument #3**  
+            - Explanation  
+            - Supporting Evidence or Example  
+
+            Be concise yet persuasive. Provide factual support where applicable.
+            """
+
             )
 
         elif step == 4:
@@ -176,36 +213,84 @@ class Debate:
             # 5. 반대 측 변론
             result["speaker"] = "neg"
             result["message"] = self.neg.answer(
-                f"""
-                "I've carefully considered the affirmative argument, but I must challenge it.
+            f"""
+            You are participating in a debate on the topic: **"{self.debate['topic']}"**. Your role is to **counter** the arguments made by the opposing (affirmative) side.  
 
-                They argued that [summary of the opposing argument], but this assumption fails to account for [logical refutation].
+            ### **Instructions:**  
+            - Review the **most recent supporting argument** and formulate a **logical rebuttal**.  
+            - Directly address each **key point** from the affirmative side.  
+            - Use **evidence, logical reasoning, and real-world examples** to dismantle their claims.  
+            - Do **not** introduce new arguments against the topic—focus solely on refuting the opposition.  
 
-                Furthermore, if we look at [evidence or examples], we see that [additional supporting points].
+            ---
 
-                For these reasons, their position is not as strong as it may seem."
+            ### **Your Response Format:**  
 
-                **Debate Topic:** {self.debate['topic']}
-                **Previous Statements:** {self.debate['debate_log'][-3]}
-                """
+            "I've carefully considered the affirmative argument, but I must challenge it.  
+
+            1. **Counterargument to Point #1:**  
+            - Summary of the opposing claim: "[summary of the opposing argument]"  
+            - Logical refutation: "[why this argument is flawed or incorrect]"  
+            - Supporting evidence or example: "[real-world data or logical reasoning]"  
+
+            2. **Counterargument to Point #2:**  
+            - Summary of the opposing claim: "[summary of the opposing argument]"  
+            - Logical refutation: "[why this argument is flawed or incorrect]"  
+            - Supporting evidence or example: "[real-world data or logical reasoning]"  
+
+            3. **Counterargument to Point #3:**  
+            - Summary of the opposing claim: "[summary of the opposing argument]"  
+            - Logical refutation: "[why this argument is flawed or incorrect]"  
+            - Supporting evidence or example: "[real-world data or logical reasoning]"  
+
+            For these reasons, the affirmative stance is not as strong as it may seem."  
+
+            **Debate Topic:** {self.debate['topic']}  
+            **Previous Statements:** {self.debate['debate_log'][-3]}  
+            """
+
             )
 
         elif step == 6:
             # 6. 찬성 측 변론
             result["speaker"] = "pos"
             result["message"] = self.pos.answer(
-                f"""
-                "I appreciate that perspective, but there are key points that were overlooked.
+            f"""
+            You are participating in a debate on the topic: **"{self.debate['topic']}"**. Your role is to **counter** the arguments made by the opposing (negative) side.  
 
-                The argument was made that [summary of the opposing argument], but it fails to address [logical refutation].
+            ### **Instructions:**  
+            - Review the **most recent opposing argument** and formulate a **logical rebuttal**.  
+            - Directly address each **key point** from the negative side.  
+            - Use **evidence, logical reasoning, and real-world examples** to dismantle their claims.  
+            - Do **not** introduce new arguments in favor of your position—focus solely on refuting the opposition.  
 
-                Additionally, if we take into account [evidence or examples], we see that [further supporting points].
+            ---
 
-                This is why our stance remains the stronger one."
+            ### **Your Response Format:**  
 
-                **Debate Topic:** {self.debate['topic']}
-                **Previous Statements:** {self.debate['debate_log'][-3]}
-                """
+            "I've carefully considered the opposing argument, but I must challenge it.  
+
+            1. **Counterargument to Point #1:**  
+            - Summary of the opposing claim: "[summary of the opposing argument]"  
+            - Logical refutation: "[why this argument is flawed or incorrect]"  
+            - Supporting evidence or example: "[real-world data or logical reasoning]"  
+
+            2. **Counterargument to Point #2:**  
+            - Summary of the opposing claim: "[summary of the opposing argument]"  
+            - Logical refutation: "[why this argument is flawed or incorrect]"  
+            - Supporting evidence or example: "[real-world data or logical reasoning]"  
+
+            3. **Counterargument to Point #3:**  
+            - Summary of the opposing claim: "[summary of the opposing argument]"  
+            - Logical refutation: "[why this argument is flawed or incorrect]"  
+            - Supporting evidence or example: "[real-world data or logical reasoning]"  
+
+            For these reasons, the opposition's stance is weaker than it appears."  
+
+            **Debate Topic:** {self.debate['topic']}  
+            **Previous Statements:** {self.debate['debate_log'][-3]}  
+            """
+
             )
 
         elif step == 7:
@@ -218,32 +303,82 @@ class Debate:
             # 8. 찬성 측 최종 결론
             result["speaker"] = "pos"
             result["message"] = self.pos.answer(
-                f"""
-                "Throughout this debate, we've demonstrated why {self.debate['topic']} is the correct position.
+            f"""
+            You are participating in a debate on the topic: **"{self.debate['topic']}"**. Your role is to **deliver the final statement in support of the affirmative position**.
 
-                The most important takeaway is [a summary of the key argument]. Even when challenged, our argument held strong because [decisive supporting point].
+            ### **Instructions:**  
+            - Summarize the **strongest and most compelling arguments** made in favor of this position.  
+            - Reinforce why the **affirmative stance remains the most logical and justified**.  
+            - Address any counterarguments and explain why they do not weaken your position.  
+            - Conclude with a **clear and persuasive final statement**.
 
-                Given the discussion we've had, it's evident that this stance is the most logical and justified."
+            ---
 
-                **Debate Topic:** {self.debate['topic']}
-                **Previous Statements:** {self.debate['debate_log'][:-2]}
-                """
+            ### **Your Response Format:**  
+
+            "Throughout this debate, we have demonstrated why **{self.debate['topic']}** is the correct stance.
+
+            1. **Key Argument #1 Recap:**  
+            - "[Summarize the most critical point in favor of the topic]"  
+            - "[Why this remains valid despite counterarguments]"  
+
+            2. **Key Argument #2 Recap:**  
+            - "[Summarize another crucial point in favor of the topic]"  
+            - "[Why this remains strong and unshaken]"  
+
+            3. **Key Argument #3 Recap:**  
+            - "[Summarize a final major argument]"  
+            - "[Why this still holds after debate]"  
+
+            Even when challenged, our argument stood firm because **[decisive supporting point]**.  
+
+            Given the discussion we've had, it is clear that **{self.debate['topic']}** is the most logical and justified stance."
+
+            **Debate Topic:** {self.debate['topic']}  
+            **Previous Statements:** {self.debate['debate_log'][:-2]}  
+            """
+
             )
 
         elif step == 9:
             # 9. 반대 측 최종 결론
             result["speaker"] = "neg"
             result["message"] = self.neg.answer(
-                f"""
-                "Let’s take a step back and look at the bigger picture.
+            f"""
+            You are participating in a debate on the topic: **"{self.debate['topic']}"**. Your role is to **deliver the final statement in support of the negative position**.
 
-                The critical flaw in the affirmative argument was [summary of key counterargument]. We’ve demonstrated that [main reasoning], and despite their responses, those weaknesses remain.
+            ### **Instructions:**  
+            - Summarize the **strongest counterarguments** presented against the topic.  
+            - Emphasize why the **opposing stance remains more rational and justified**.  
+            - Address the affirmative side’s claims and explain why they are insufficient.  
+            - Conclude with a **strong and persuasive closing statement**.
 
-                After carefully evaluating all points, it’s clear that this stance does not hold up."
+            ---
 
-                **Debate Topic:** {self.debate['topic']}
-                **Previous Statements:** {self.debate['debate_log'][:-4]}
-                """
+            ### **Your Response Format:**  
+
+            "Throughout this debate, we have made it clear why **{self.debate['topic']}** is flawed and should not be accepted.
+
+            1. **Key Counterargument #1 Recap:**  
+            - "[Summarize the strongest counterpoint against the topic]"  
+            - "[Why this remains valid despite rebuttals]"  
+
+            2. **Key Counterargument #2 Recap:**  
+            - "[Summarize another major counterargument]"  
+            - "[Why this undermines the affirmative position]"  
+
+            3. **Key Counterargument #3 Recap:**  
+            - "[Summarize a final critical point]"  
+            - "[Why this is decisive in rejecting the topic]"  
+
+            Despite the claims made by the affirmative side, their position **[highlight why it is weak or flawed]**.  
+
+            Given the discussion we've had, it is evident that **{self.debate['topic']}** is not as justified as it seems, making the opposing stance the more reasonable conclusion."
+
+            **Debate Topic:** {self.debate['topic']}  
+            **Previous Statements:** {self.debate['debate_log'][:-2]}  
+            """
+
             )
 
         elif step == 10:
@@ -263,7 +398,6 @@ class Debate:
             result["speaker"] = "SYSTEM"
             result["message"] = "The debate has already concluded."
         
-        self.debate["debate_log"].append(result["message"])
         debate["debate_log"].append(result)
         result["timestamp"] = datetime.now()
         self.save()
@@ -386,6 +520,7 @@ class Debate:
         try:
             self.debate = self.db_connection.select_data_from_id("debate", self.debate["_id"])
         except Exception as e:
+            print("load failed:", e)
             return False
         return True
 
