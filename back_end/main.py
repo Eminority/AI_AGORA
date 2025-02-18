@@ -12,7 +12,7 @@ from debate.debate import Debate
 from debate.debate_manager import DebateManager
 from groq import Groq
 from crawling import DebateDataProcessor
-
+from detect_persona import DetectPersona
 if __name__ == "__main__":
 
     #MONGO_URI, DB_NAME 확인
@@ -44,6 +44,9 @@ if __name__ == "__main__":
     debate_manager = DebateManager(participant_factory=participant_factory, debate_data_processor=debate_data_processor,db_connection=db_connection)
     ###############################임시로 입력받는 테스트 코드
 
+    ###detectpersona
+    detect_persona = DetectPersona(AI_API_KEY=AI_API_KEY["GEMINI"])
+
     ####임시 사용자
     # user_name = input("pos 이름 설정 : ")
     # user_id = "temp_id_111111111"
@@ -65,7 +68,8 @@ if __name__ == "__main__":
     opponent = {"name"  : opponent_name,
                 "_id"   : opponent_id,
                 "ai"    : opponent_ai,
-                "img" : None
+                "img" : None,
+                "object_attribute": detect_persona.get_traits(opponent_name)
                 }
     
     participants = {"pos" : user, "neg" : opponent}

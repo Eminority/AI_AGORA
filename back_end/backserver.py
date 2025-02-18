@@ -12,6 +12,7 @@ from yolo_detect import YOLODetect
 from image_manager import ImageManager
 from detect_persona import DetectPersona
 from debate.check_topic import CheckTopic
+from crawling import DebateDataProcessor
 # 환경 변수 로드
 load_dotenv()
 
@@ -52,6 +53,8 @@ detect_persona = DetectPersona(db_connection=db_connection, AI_API_KEY=AI_API_KE
 
 #프로필 관리 객체 생성
 profile_manager = ProfileManager(db=db_connection, persona_module=detect_persona)
+
+
 
 #토론 관리 인스턴스 생성
 debateManager = DebateManager(participant_factory=participant_factory, db_connection=db_connection)
