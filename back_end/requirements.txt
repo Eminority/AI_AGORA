@@ -19,3 +19,4 @@ langchain_google_genai
 wikipedia
 google
 googlesearch-python
+webserver

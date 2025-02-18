@@ -5,10 +5,7 @@ from detect_persona import DetectPersona
 class ProfileManager:
     def __init__(self, db: MongoDBConnection, persona_module:DetectPersona):
         data = db.select_data_from_query(collection_name="object", query={})
-<<<<<<< HEAD
-=======
         self.db = db
->>>>>>> dev0
         self.objectlist = {}
         self.persona_module = persona_module
         for raw_object in data:
