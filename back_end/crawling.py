@@ -19,13 +19,9 @@ def load_api_keys():
     """
     api_key_json = json.loads(os.getenv("AI_API_KEY"))
     
-    # 환경 변수 값 출력 (디버깅용)
-    print(f"🔍 [DEBUG] AI_API_KEY 환경 변수 값: {api_key_json}")
-
     if api_key_json:
         try:
             api_keys = api_key_json  # JSON 변환
-            print(f"✅ [DEBUG] 변환된 API 키 딕셔너리: {api_keys}")  # 디버깅 출력
             return api_keys
         except json.JSONDecodeError:
             raise ValueError("환경 변수 'AI_API_KEY'가 올바른 JSON 형식이 아닙니다. .env 파일을 확인하세요.")
@@ -41,18 +37,18 @@ class DebateDataProcessor:
             api_keys (dict): AI_Factory에서 전달된 API 키 딕셔너리
         """
         self.api_key = api_keys.get("GSE")  # AI_Factory에서 전달받은 값 사용
-
+        self.max_results = max_results
+        self.headless = headless
         if not self.api_key:
             raise KeyError("환경 변수에서 'GSE' 키를 찾을 수 없습니다. .env 파일을 확인하세요.")
 
         self.cx = os.getenv("CX")
         if not self.cx:
             raise ValueError("환경 변수에서 'CX' 값을 찾을 수 없습니다. .env 파일을 확인하세요.")
+        self.driver = self._init_driver()
 
-        print(f"✅ Google Custom Search API 키 로드 완료: {self.api_key}")
-        print(f"✅ Google Custom Search CX ID 로드 완료: {self.cx}")
-
-    def _init_driver(self, headless):
+        
+    def _init_driver(self):
         """
         Selenium WebDriver 초기화.
 
@@ -63,7 +59,7 @@ class DebateDataProcessor:
             webdriver.Chrome: 설정된 WebDriver 인스턴스.
         """
         options = webdriver.ChromeOptions()
-        if headless:
+        if self.headless:
             options.add_argument("--headless")  # 창 없이 실행
         options.add_argument("--disable-gpu")
         options.add_argument("--no-sandbox")
@@ -191,15 +187,15 @@ class DebateDataProcessor:
             self.driver.quit()
 
 
-# 실행 예시
-if __name__ == "__main__":
-    processor = DebateDataProcessor(max_results=3, headless=True)
-    topic = "AI technology"
+# # 실행 예시
+# if __name__ == "__main__":
+#     processor = DebateDataProcessor(max_results=3, headless=True)
+#     topic = "AI technology"
     
-    articles = processor.get_articles(topic)
+#     articles = processor.get_articles(topic)
 
-    # 결과 출력
-    for idx, article in enumerate(articles, 1):
-        print(f"기사 {idx}:\n{article['content']}...\n")  
+#     # 결과 출력
+#     for idx, article in enumerate(articles, 1):
+#         print(f"기사 {idx}:\n{article['content']}...\n")  
 
-    processor.quit_driver()
+#     processor.quit_driver()

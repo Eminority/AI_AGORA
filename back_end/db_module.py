@@ -22,7 +22,6 @@ class MongoDBConnection:
             self.db = self.client[db_name]
             # 연결 테스트
             self.client.admin.command('ping')
-            print("✅ DB Connection Succeeded")
         except Exception as e:
             print("❌ Connection failed:", e)
 
@@ -51,7 +50,6 @@ class MongoDBConnection:
         MongoDB 연결 종료
         """
         self.client.close()
-        print("🔌 MongoDB 연결 해제됨")
 
 
 

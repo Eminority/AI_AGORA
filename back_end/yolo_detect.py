@@ -20,7 +20,7 @@ class YOLODetect:
         """
         image = cv2.imread(image_path)
         if image is None:
-            print(f"❌ 오류: '{image_path}' 이미지를 찾을 수 없습니다.")
+            print(f"오류: '{image_path}' 이미지를 찾을 수 없습니다.")
             return json.dumps({"error": "Image not found"}, indent=4)
 
         # 객체 탐지 수행

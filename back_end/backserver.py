@@ -49,15 +49,19 @@ os.makedirs(real_image_save_path, exist_ok=True)
 image_manager = ImageManager(db=db_connection, img_path=real_image_save_path)
 
 #persona 생성기
-detect_persona = DetectPersona(db_connection=db_connection, AI_API_KEY=AI_API_KEY["GEMINI"])
+detect_persona = DetectPersona(AI_API_KEY=AI_API_KEY["GEMINI"])
 
 #프로필 관리 객체 생성
 profile_manager = ProfileManager(db=db_connection, persona_module=detect_persona)
 
+#크롤링하는 객체 생성
+debate_data_processor = DebateDataProcessor(api_keys=AI_API_KEY)
 
 
 #토론 관리 인스턴스 생성
-debateManager = DebateManager(participant_factory=participant_factory, db_connection=db_connection)
+debateManager = DebateManager(participant_factory=participant_factory,
+                              debate_data_processor=debate_data_processor,
+                              db_connection=db_connection)
 
 #토론 주제 확인 객체
 topic_checker = CheckTopic(AI_API_KEY["GEMINI"])
@@ -70,7 +74,9 @@ def create_debate(pos_id: str = Form(...),
     
     if topic_checker.checktopic(topic):
         pos = db_connection.select_data_from_id("object", pos_id)
+        pos["img"] = db_connection.select_data_from_id("image", pos.get("img")).get("filename")
         neg = db_connection.select_data_from_id("object", neg_id)
+        neg["img"] = db_connection.select_data_from_id("image", neg.get("img")).get("filename")
 
         id = debateManager.create_debate(pos, neg, topic)
 
@@ -98,6 +104,7 @@ def get_debate_history(id:str = Query(..., description="토론 id")):
     if debateManager.debatepool.get(id):
         debatedata = debateManager.debatepool[id].debate
         debatedata["_id"] = str(debatedata["_id"])
+        debatedata.get("participants").get("pos").get("img")
         print(debatedata)
         return debatedata
     else:
@@ -116,7 +123,9 @@ def get_debate_list():
 @app.get("/profile/list")
 def get_ai_list():
     # id - data 형태로 묶어서 데이터 전송
-    return {id : profile_manager.objectlist[id] for id in profile_manager.objectlist.keys()}
+    result = {id : profile_manager.objectlist[id] for id in profile_manager.objectlist.keys()}
+    print(result)
+    return result
 
 
 ##yolo로 이미지 판단해서 list 반환하기
@@ -129,7 +138,12 @@ def object_detect(file: UploadFile = File(...)):
     result_data = {"result":local_image_data.get("result")}
     if result_data["result"]:
         detect_data = yoloDetector.detect_objects(local_image_data["data"])
-        result_data["data"] = image_manager.crop_image(local_image_data["data"], detect_data)
+        if detect_data:
+            result_data["detected"] = True
+            result_data["data"] = image_manager.crop_image(local_image_data["data"], detect_data)
+        else:
+            result_data["detected"] = False
+            result_data["data"] = {"filename": local_image_data.get("data")}
     return result_data
 
 
@@ -143,8 +157,9 @@ def create_ai_profile(name:str = Form(...),
     if save_result.get("result") == "success":
         new_id = profile_manager.create_profile(name=name,
                                     img=save_result["file_id"],
-                                    ai=ai)
-        if new_id.get("result"):
+                                    ai=ai).get("id")
+        if new_id:
+            print(new_id)
             return {"result":"success", "id":new_id}
     return {"result":"error"}
 

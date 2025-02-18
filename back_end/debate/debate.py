@@ -144,7 +144,7 @@ class Debate:
                 Given the evidence, supporting this position is the most rational choice."
 
                 **Debate Topic:** {self.debate['topic']}
-                **Previous Statements:** {self.debate['debate_log'][-1] if self.debate['debate_log'] else "None"}
+                **Previous Statements:** {self.debate['debate_log'][-1]}
                 """
             )
 
@@ -286,25 +286,21 @@ class Debate:
         # [1] 한 참가자(우선순위: pos → neg → judge)를 통해 크롤링 및 벡터 스토어 생성
         
         if self.pos and hasattr(self.pos, 'agora_ai'):
-            print("[INFO] POS 측에서 크롤링을 실행합니다.")
             self.pos.agora_ai.crawling(debate_processor=self.debate_data_processor,topic=topic)
             shared_crawled_data = self.pos.agora_ai.crawled_data
             shared_vectorstore = self.pos.agora_ai.vectorstore
 
         elif self.neg and hasattr(self.neg, 'agora_ai'):
-            print("[INFO] NEG 측에서 크롤링을 실행합니다.")
             self.neg.agora_ai.crawling(debate_processor=self.debate_data_processor,topic=topic)
             shared_crawled_data = self.neg.agora_ai.crawled_data
             shared_vectorstore = self.neg.agora_ai.vectorstore
 
         elif self.judge:
             if hasattr(self.judge, 'agora_ai'):
-                print("[INFO] JUDGE 측(agora_ai 있음)에서 크롤링을 실행합니다.")
                 self.judge.agora_ai.crawling(debate_processor=self.debate_data_processor,topic=topic)
                 shared_crawled_data = self.judge.agora_ai.crawled_data
                 shared_vectorstore = self.judge.agora_ai.vectorstore
             else:
-                print("[INFO] JUDGE 측에서 크롤링을 실행합니다.")
                 if hasattr(self.judge, 'crawling'):
                     self.judge.crawling(debate_processor=self.debate_data_processor,topic=topic)
                 # getattr를 사용해 속성이 없으면 None을 기본값으로 사용
@@ -334,7 +330,7 @@ class Debate:
                     self.judge.crawled_data = shared_crawled_data
                     self.judge.vectorstore = shared_vectorstore
         else:
-            print("❌ 크롤링이나 벡터 스토어 생성에 실패하여, 결과를 공유할 수 없습니다.")
+            print("크롤링이나 벡터 스토어 생성에 실패하여, 결과를 공유할 수 없습니다.")
 
 
     # def evaluate(self):
@@ -390,7 +386,6 @@ class Debate:
         try:
             self.debate = self.db_connection.select_data_from_id("debate", self.debate["_id"])
         except Exception as e:
-            print("load failed:", e)
             return False
         return True
 

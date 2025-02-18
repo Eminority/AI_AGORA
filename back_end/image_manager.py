@@ -56,7 +56,6 @@ class ImageManager:
         """
         로컬의 이미지를 잘라서 저장하고 자른 목록을 반환
         """
-        print(image_path)
         image_name = image_path.split("\\")[-1]
         target_image = Image.open(image_path)
         result = {}

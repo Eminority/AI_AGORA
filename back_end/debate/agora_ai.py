@@ -1,8 +1,9 @@
 from vectorstore_module import VectorStoreHandler
 from crawling import DebateDataProcessor
+from .ai_module.ai_instance import AI_Instance
 # participant 또는 심판으로 들어갈 ai
 class Agora_AI:
-    def __init__(self, ai_type: str, ai_instance, personality:str="", vector_handler: VectorStoreHandler = None):
+    def __init__(self, ai_type: str, ai_instance:AI_Instance, personality:str="", vector_handler: VectorStoreHandler = None):
         """
         Args:
             ai_type (str): AI 모델 타입 (예: 'GEMINI', 'ollama' 등).
@@ -39,8 +40,6 @@ class Agora_AI:
         if not articles:
             print("❌ 크롤링된 데이터가 없습니다.")
             return
-
-        print(f"✅ {len(articles)}개의 기사 크롤링 완료!")
         self.crawled_data.extend(articles)  # 크롤링된 기사 누적
 
         # 크롤링한 데이터를 벡터 스토어에 저장

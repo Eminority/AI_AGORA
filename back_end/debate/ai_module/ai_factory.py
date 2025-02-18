@@ -9,7 +9,6 @@ class AI_Factory:
         예: {"GEMINI": "GEMINI_API_KEY", "GROQ": "GROQ_API_KEY"}
         """
         self.api = api_keys
-        print(self.api)
 
         # Groq에서 지원하는 모델 목록
         self.groq_models = {

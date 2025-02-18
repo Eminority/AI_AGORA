@@ -8,7 +8,7 @@ import os
 load_dotenv()  # .env 파일 로드
 config.debate_server_uri = os.getenv("DEBATE_SERVER")
 
-print(config.debate_server_uri)
+# print(config.debate_server_uri)
 
 
 app = FastAPI()

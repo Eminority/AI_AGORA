@@ -24,18 +24,12 @@ class OllamaRunner:
     def pull_model(self):
         """모델이 없으면 다운로드 (URL에서 가져와서 설치)"""
         if self.model_installed or self.is_model_installed():  
-#            print(f"✅ '{self.model_name}' 모델이 이미 설치됨.")
             self.model_installed = True
             return True
-
-        print(f"🔍 '{self.model_name}' 모델 확인 중...")
-
-        print(f"📥 '{self.model_name}' 모델 다운로드 중...")
         url = f"{self.base_url}/api/pull"
         response = requests.post(url, json={"name": self.model_name})
 
         if response.status_code == 200:
-            print(f"✅ '{self.model_name}' 다운로드 완료!")
             self.model_installed = True
             return True
         else:

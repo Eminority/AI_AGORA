@@ -31,7 +31,6 @@ class GeminiAPI:
         :param role_text: 시스템 역할 또는 지침 텍스트
         """
         self.role = role_text
-        print("시스템 역할이 설정되었습니다.")
 
     def set_personality(self, personality_text: str):
         """
@@ -41,7 +40,6 @@ class GeminiAPI:
         :param personality_text: 성격이나 어조를 나타내는 문자열
         """
         self.personality = personality_text
-        print("성격 설정이 완료되었습니다.")
 
 
     def generate_text(self, user_prompt: str, max_tokens: int = 200) -> str:
@@ -112,7 +110,7 @@ class GeminiAPI:
         :param collection_name: 저장할 컬렉션 이름 (기본값: 'prompts')
         """
         if self.db is None:
-            print("❌ MongoDB 연결이 없습니다. 프롬프트를 저장할 수 없습니다.")
+            print("MongoDB 연결이 없습니다. 프롬프트를 저장할 수 없습니다.")
             return
         try:
             data = {
@@ -120,9 +118,8 @@ class GeminiAPI:
                 "timestamp": datetime.now()
             }
             result = self.db[collection_name].insert_one(data)
-            print(f"✅ 프롬프트 저장 성공 (문서 ID: {result.inserted_id})")
         except Exception as e:
-            print(f"❌ 프롬프트 저장 실패: {e}")
+            print(f"프롬프트 저장 실패: {e}")
 
     def save_response_to_db(self, collection_name: str, prompt: str, response: str):
         """
@@ -133,7 +130,7 @@ class GeminiAPI:
         :param response: Gemini의 응답 텍스트
         """
         if self.db is None:
-            print("❌ MongoDB 연결이 없습니다. 응답을 저장할 수 없습니다.")
+            print("MongoDB 연결이 없습니다. 응답을 저장할 수 없습니다.")
             return
         try:
             data = {
@@ -142,9 +139,8 @@ class GeminiAPI:
                 "timestamp": datetime.now()
             }
             result = self.db[collection_name].insert_one(data)
-            print(f"✅ 데이터 저장 성공 (문서 ID: {result.inserted_id})")
         except Exception as e:
-            print(f"❌ 데이터 저장 실패: {e}")
+            print(f"데이터 저장 실패: {e}")
 
     def close_connection(self):
         """
@@ -153,4 +149,3 @@ class GeminiAPI:
         genai.configure(api_key=None)
         if self.db_connection:
             self.db_connection.close_connection()
-        print("Gemini API 연결이 해제되었습니다.")

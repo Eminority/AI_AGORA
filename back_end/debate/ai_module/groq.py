@@ -26,7 +26,7 @@ class GroqAPI:
         :param personality_text: 시스템 역할 또는 지침 텍스트
         """
         self.personality = personality_text
-        print("시스템 역할이 설정되었습니다.")
+
 
     def generate_text(self, user_prompt: str, max_tokens: int = 200, temperature: float = 0.7) -> str:
         """
@@ -120,4 +120,4 @@ class GroqAPI:
         # Groq API는 stateless하므로 별도의 연결 해제가 필요하지 않을 수 있음.
         self.api_key = None
         self.headers["Authorization"] = ""
-        print("Groq API 연결이 해제되었습니다.")
+      

@@ -15,12 +15,6 @@ class DetectPersona:
         self.local_model = "llama3.2"  # Local 모델 이름
         self.retriever = WikipediaRetriever()
 
-        # try:
-        #     self.local_llm = ChatOllama(model=self.local_model)
-        #     print(f"✅ Local 모델이 '{self.local_model}'으로 설정되었습니다.")
-        # except Exception as e:
-        #     print(f"{self.local_model} 을 찾을 수 없습니다. \n {e}")
-        # GEMINI API 설정
         if AI_API_KEY:
             genai.configure(api_key=AI_API_KEY)
             self.gemini_model = genai.GenerativeModel('gemini-pro')
