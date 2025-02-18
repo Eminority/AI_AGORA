@@ -24,6 +24,7 @@ class CheckTopic :
         try:
             response = self.gemini_api.generate_text(prompt, max_tokens=5)  # 최대 5토큰 (True/False 응답만 받도록)
             result = response.strip().lower()
+            print(result)
             return result == "true"
         except Exception as e:
             print(f"Error in is_debatable_topic: {e}")

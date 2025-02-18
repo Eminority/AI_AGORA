@@ -12,6 +12,7 @@ from yolo_detect import YOLODetect
 from image_manager import ImageManager
 from detect_persona import DetectPersona
 from debate.check_topic import CheckTopic
+from crawling import DebateDataProcessor
 # 환경 변수 로드
 load_dotenv()
 
@@ -53,8 +54,14 @@ detect_persona = DetectPersona(AI_API_KEY=AI_API_KEY["GEMINI"])
 #프로필 관리 객체 생성
 profile_manager = ProfileManager(db=db_connection, persona_module=detect_persona)
 
+#크롤링하는 객체 생성
+debate_data_processor = DebateDataProcessor(api_keys=AI_API_KEY)
+
+
 #토론 관리 인스턴스 생성
-debateManager = DebateManager(participant_factory=participant_factory, db_connection=db_connection)
+debateManager = DebateManager(participant_factory=participant_factory,
+                              debate_data_processor=debate_data_processor,
+                              db_connection=db_connection)
 
 #토론 주제 확인 객체
 topic_checker = CheckTopic(AI_API_KEY["GEMINI"])
@@ -67,7 +74,9 @@ def create_debate(pos_id: str = Form(...),
     
     if topic_checker.checktopic(topic):
         pos = db_connection.select_data_from_id("object", pos_id)
+        pos["img"] = db_connection.select_data_from_id("image", pos.get("img")).get("filename")
         neg = db_connection.select_data_from_id("object", neg_id)
+        neg["img"] = db_connection.select_data_from_id("image", neg.get("img")).get("filename")
 
         id = debateManager.create_debate(pos, neg, topic)
 
@@ -95,6 +104,7 @@ def get_debate_history(id:str = Query(..., description="토론 id")):
     if debateManager.debatepool.get(id):
         debatedata = debateManager.debatepool[id].debate
         debatedata["_id"] = str(debatedata["_id"])
+        debatedata.get("participants").get("pos").get("img")
         print(debatedata)
         return debatedata
     else:
@@ -133,7 +143,7 @@ def object_detect(file: UploadFile = File(...)):
             result_data["data"] = image_manager.crop_image(local_image_data["data"], detect_data)
         else:
             result_data["detected"] = False
-            result_data["data"] = {local_image_data.get("result"), "default_image"}
+            result_data["data"] = {"filename": local_image_data.get("data")}
     return result_data
 
 

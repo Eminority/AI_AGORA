@@ -5,6 +5,7 @@ from datetime import datetime
 import shutil
 import os
 from PIL import Image
+import json
 class ImageManager:
     def __init__(self, db:MongoDBConnection, img_path:str):
         self.db = db
@@ -42,27 +43,27 @@ class ImageManager:
             return {"result":False, "data":e}
         
     def save_image_in_local_from_form(self, file:UploadFile=File(...)) -> dict:
-        save_path = f"{self.img_path}\\{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}_{file.filename}.png"
+        filename = f"{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}_{file.filename}.png"
+        save_path = f"{self.img_path}\\{filename}"
         try:
             with open(save_path, "wb") as buffer:
                 shutil.copyfileobj(file.file, buffer)
 
-            return {"result":True, "data":save_path}
+            return {"result":True, "data":filename}
         except Exception as e:
             print(e)
             return {"result":False, "data":e}
         
-    def crop_image(self, image_path:str, objectlist:list) -> dict:
+    def crop_image(self, image_path:str, objectlist) -> dict:
         """
         로컬의 이미지를 잘라서 저장하고 자른 목록을 반환
         """
-        print(image_path)
+        print(">>>>>>>>>>>>>>>"+image_path)
         image_name = image_path.split("\\")[-1]
-        target_image = Image.open(image_path)
+        target_image = Image.open(self.img_path+"\\"+image_path)
         result = {}
-        print(objectlist)
         for detected_object in objectlist:
-            bbox = detected_object["bounding_box"]
+            bbox = detected_object.get("bounding_box")
             x1 = int(bbox["x1"])
             x2 = int(bbox["x2"])
             y1 = int(bbox["y1"])

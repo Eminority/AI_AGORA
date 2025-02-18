@@ -1,7 +1,7 @@
 from ultralytics import YOLO
 import cv2
 import json
-
+import os
 class YOLODetect:
     def __init__(self, model_path="yolo11n.pt", confidence_threshold=0.5):
         """
@@ -9,19 +9,20 @@ class YOLODetect:
         :param model_path: 사용할 YOLO 모델 경로
         :param confidence_threshold: 객체 탐지 임계값
         """
+        self.imgpath = f"{os.getcwd()}\\image\\"
         self.model = YOLO(model_path)
         self.confidence_threshold = confidence_threshold
 
-    def detect_objects(self, image_path):
+    def detect_objects(self, image_path) -> list:
         """
         이미지에서 객체를 탐지하고 JSON 형식으로 반환
         :param image_path: 처리할 이미지 파일 경로
         :return: 탐지된 객체 목록 (JSON 형식)
         """
-        image = cv2.imread(image_path)
+        image = cv2.imread(self.imgpath+image_path)
         if image is None:
-            print(f"❌ 오류: '{image_path}' 이미지를 찾을 수 없습니다.")
-            return json.dumps({"error": "Image not found"}, indent=4)
+            print(f"❌ 오류: '{self.imgpath+image_path}' 이미지를 찾을 수 없습니다.")
+            return []
 
         # 객체 탐지 수행
         results = self.model(image)
@@ -46,8 +47,6 @@ class YOLODetect:
                         }
                     }
                     detected_objects.append(object_data)
-
-        #list로 전송
         return detected_objects
 
 #예시

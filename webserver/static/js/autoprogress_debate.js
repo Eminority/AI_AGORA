@@ -6,20 +6,19 @@ async function autoProgressDebate(debateId) {
             formData.append("id", debateId);
             formData.append("message", "");  // 빈 메시지 전송
 
-            const response = await fetch("/debate/progress", {
+            const response = await fetchWithTimeout("/debate/progress", {
                 method: "POST",
                 headers: { "Content-Type": "application/x-www-form-urlencoded" },
-                body: formData
-            });
+                body: formData},
+                100000
+            );
 
-            if (!response.ok) throw new Error("서버 응답 실패");
-
-            const result = await response.json();
+            const result = await response;
             console.log("AI 진행 응답:", result);
 
             // 📌 AI 응답이 있으면 채팅창에 추가
             if (result.progress) {
-                addMessageToChat(result.progress.speaker, result.progress.timestamp + "\n" + result.progress.message, "received");
+                addMessageToChat(result.progress.speaker, result.progress.timestamp, result.progress.message);
             } else if (result.message) {
                 console.log("AI 토론 종료 메시지 감지:", result.message);
                 break; // 📌 AI 진행 중단

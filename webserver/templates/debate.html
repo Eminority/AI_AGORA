@@ -15,6 +15,7 @@
 
     <script src="{{ url_for('static', path='js/chat.js') }}"></script>
     <script src="{{ url_for('static', path='js/autoprogress_debate.js') }}"></script>
+    <script src="{{ url_for('static', path='js/fetch_with_timeout.js') }}"></script>
 
     <script>
         document.addEventListener("DOMContentLoaded", async function() {
@@ -27,24 +28,15 @@
             }
     
             try {
-                const response = await fetch(`/debate/info?id=${debateId}`);
-                if (!response.ok) throw new Error("서버 응답 실패");
+                
+                const actionUrl = `debate/info?id=${debateId}`
+                const response = await fetchWithTimeout(actionUrl,{
+                    method: "get"},
+                    100000);
+                if(!response) throw new Error("서버 응답 실패");
     
-                const data = await response.json();
+                const data = response;
     
-                document.querySelector(".pos_name").textContent = data.participants.pos.name || "알 수 없음";
-                document.querySelector(".neg_name").textContent = data.participants.neg.name || "알 수 없음";
-                document.querySelector(".topic").textContent = data.topic || "알 수 없음";
-    
-                // 📌 debate_log 데이터를 채팅창에 추가 (공용 addMessageToChat() 사용)
-                if (data.debate_log && Array.isArray(data.debate_log)) {
-                    data.debate_log.forEach(log => {
-                        const sender = log.speaker || "알 수 없음";
-                        const message = log.timestamp + "\n" + log.message || "내용 없음";
-                        addMessageToChat(sender, message, "received");
-                    });
-                }
-
                  // 📌 AI 토론자가 존재하면 자동으로 `/debate/progress` 요청을 반복 실행
                  if (data.participants.pos.ai && data.participants.neg.ai) {
                     document.querySelector(".chat-input").style.display = "none";
