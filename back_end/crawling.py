@@ -63,7 +63,7 @@ class DebateDataProcessor:
             options.add_argument("--headless")  # 창 없이 실행
         # options.add_argument("--disable-gpu")
         options.add_argument("--no-sandbox")
-        options.add_argument('--ignore-certificate-errors')
+        options.add_argument('--ignore-certificate-errors') #SSL 인증 무시
         options.add_argument("--disable-dev-shm-usage")
 
         service = Service(ChromeDriverManager().install())
