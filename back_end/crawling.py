@@ -2,34 +2,14 @@ import time
 import random
 import requests
 import os
-import json
-from dotenv import load_dotenv  # 환경 변수 로드
 from bs4 import BeautifulSoup
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.service import Service
-from webdriver_manager.chrome import ChromeDriverManager 
-
-# .env 파일 로드
-load_dotenv()
-
-def load_api_keys():
-    """
-    환경 변수에서 AI API 키를 로드하는 공통 함수.
-    """
-    api_key_json = json.loads(os.getenv("AI_API_KEY"))
-    
-    if api_key_json:
-        try:
-            api_keys = api_key_json  # JSON 변환
-            return api_keys
-        except json.JSONDecodeError:
-            raise ValueError("환경 변수 'AI_API_KEY'가 올바른 JSON 형식이 아닙니다. .env 파일을 확인하세요.")
-    else:
-        raise ValueError("환경 변수 'AI_API_KEY'가 설정되지 않았습니다.")
+from webdriver_manager.chrome import ChromeDriverManager
 
 class DebateDataProcessor:
-    def __init__(self, api_keys: dict, max_results=5, headless=False):
+    def __init__(self, api_keys: dict, max_results=5, headless=True):
         """
         초기화 메서드.
         
@@ -45,9 +25,9 @@ class DebateDataProcessor:
         self.cx = os.getenv("CX")
         if not self.cx:
             raise ValueError("환경 변수에서 'CX' 값을 찾을 수 없습니다. .env 파일을 확인하세요.")
+
         self.driver = self._init_driver()
 
-        
     def _init_driver(self):
         """
         Selenium WebDriver 초기화.
@@ -61,9 +41,9 @@ class DebateDataProcessor:
         options = webdriver.ChromeOptions()
         if self.headless:
             options.add_argument("--headless")  # 창 없이 실행
-        # options.add_argument("--disable-gpu")
+        # options.add_argument("--disable-gpu") #gpu 사용
         options.add_argument("--no-sandbox")
-        options.add_argument('--ignore-certificate-errors')
+        options.add_argument('--ignore-certificate-errors') #SSL 인증 무시
         options.add_argument("--disable-dev-shm-usage")
 
         service = Service(ChromeDriverManager().install())
@@ -169,7 +149,7 @@ class DebateDataProcessor:
         Returns:
             list: 기사 본문 리스트.
         """
-        num_articles = num_articles or self.max_results
+        num_articles = num_articles if num_articles else self.max_results
         article_links = self.search_articles(topic)
 
         articles_data = []
@@ -177,7 +157,7 @@ class DebateDataProcessor:
             article_content = self._fetch_article_content(link)
             if article_content:
                 articles_data.append({"content": article_content})
-        print("크롤링이 실행되었습니다.")
+
         return articles_data
 
     def quit_driver(self):
@@ -188,15 +168,15 @@ class DebateDataProcessor:
             self.driver.quit()
 
 
-# # 실행 예시
-# if __name__ == "__main__":
-#     processor = DebateDataProcessor(max_results=3, headless=True)
-#     topic = "AI technology"
+# 실행 예시
+if __name__ == "__main__":
+    processor = DebateDataProcessor(max_results=3, headless=True)
+    topic = "AI technology"
     
-#     articles = processor.get_articles(topic)
+    articles = processor.get_articles(topic)
 
-#     # 결과 출력
-#     for idx, article in enumerate(articles, 1):
-#         print(f"기사 {idx}:\n{article['content']}...\n")  
+    # 결과 출력
+    for idx, article in enumerate(articles, 1):
+        print(f"기사 {idx}:\n{article['content']}...\n")  
 
-#     processor.quit_driver()
+    processor.quit_driver()

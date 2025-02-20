@@ -1,5 +1,5 @@
 import google.generativeai as genai
-from .ai_module.gemini import GeminiAPI
+from .ai_module.gemini import GeminiAPI 
 
 class CheckTopic :
     def __init__(self, api_key : str):

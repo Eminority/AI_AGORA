@@ -1,6 +1,6 @@
 from .agora_ai import Agora_AI
 from .ai_module.ai_factory import AI_Factory
-from vectorstore_module import VectorStoreHandler
+from vectorstore_module import VectorStoreHandler  
 class ParticipantFactory:
     def __init__(self, vector_handler: VectorStoreHandler, ai_factory:AI_Factory):
         self.vector_handler = vector_handler

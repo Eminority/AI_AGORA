@@ -504,9 +504,9 @@ class Debate:
         if match:
             pro_score = int(match.group(1))
             if pro_score > 50:
-                self.debate["result"] = "pos"
+                self.debate["result"] = "positive"
             elif pro_score < 50:
-                self.debate["result"] = "neg"
+                self.debate["result"] = "negative"
             else:
                 self.debate["result"] = "draw"
         else:

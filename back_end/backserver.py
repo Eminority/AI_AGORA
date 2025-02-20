@@ -1,4 +1,5 @@
 from fastapi import FastAPI, Form, Query, File, UploadFile
+from fastapi.responses import FileResponse
 import os
 import json
 from dotenv import load_dotenv
@@ -78,6 +79,8 @@ def create_debate(pos_id: str = Form(...),
         neg = db_connection.select_data_from_id("object", neg_id)
         neg["img"] = db_connection.select_data_from_id("image", neg.get("img")).get("filename")
 
+        print(pos["img"], " ", neg["img"])
+
         id = debateManager.create_debate(pos, neg, topic)
 
         return {"result":True, "message": "토론이 생성되었습니다.", "topic": topic, "id":id}
@@ -104,7 +107,6 @@ def get_debate_history(id:str = Query(..., description="토론 id")):
     if debateManager.debatepool.get(id):
         debatedata = debateManager.debatepool[id].debate
         debatedata["_id"] = str(debatedata["_id"])
-        debatedata.get("participants").get("pos").get("img")
         print(debatedata)
         return debatedata
     else:
@@ -162,6 +164,24 @@ def create_ai_profile(name:str = Form(...),
             print(new_id)
             return {"result":"success", "id":new_id}
     return {"result":"error"}
+
+
+#webserver에서 이미지 요청하면 건네주는 코드
+@app.get("/image/{image_name}")
+async def send_image(image_name:str):
+    image = os.path.join(IMAGE_SAVE_PATH, image_name)
+    if os.path.exists(image):
+        return FileResponse(image, media_type="image/png")
+    image_from_db = db_connection.select_data_from_query("image", {"filename":image_name})[0]
+    print(">>>>>>>>>>>>>>>>>>")
+    print(image_from_db)
+    if image_from_db:
+        with open(image, "wb") as f: 
+            f.write(bytes(image_from_db["data"]))
+        return FileResponse(image, media_type="image/png")
+
+    print("nope!")
+
 
 ##실행코드
 # uvicorn backserver:app --host 0.0.0.0 --port 8000 --reload

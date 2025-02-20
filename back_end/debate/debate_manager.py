@@ -1,6 +1,6 @@
 from .debate import ParticipantFactory, Debate
 from db_module import MongoDBConnection
-from crawling import DebateDataProcessor
+from crawling import DebateDataProcessor 
 class DebateManager:
     def __init__(self, participant_factory:ParticipantFactory, debate_data_processor:DebateDataProcessor, db_connection:MongoDBConnection):
         self.debatepool = {}

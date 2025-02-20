@@ -1,6 +1,6 @@
 from langchain_community.retrievers import WikipediaRetriever
 from langchain.prompts import PromptTemplate
-import google.generativeai as genai
+import google.generativeai as genai 
 
 class DetectPersona:
     """
@@ -27,7 +27,7 @@ class DetectPersona:
         - 존재하지 않으면 새로 분석 후 DB에 저장.
         """
         # 🔍 정보 검색 단계
-        docs = self.retriever.invoke(object_name)  # ✅ 최신 LangChain 메서드 사용
+        docs = self.retriever.invoke(object_name)
         if not docs:
             return "❌ 해당 객체에 대한 정보를 찾을 수 없습니다."
         context = docs[0].page_content

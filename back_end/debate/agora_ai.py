@@ -78,7 +78,7 @@ class Agora_AI:
         if self.vectorstore is None:
             raise ValueError("벡터스토어 생성에 실패했습니다.")
 
-    def generate_text(self, prompt: str, k: int = 5, max_tokens: int = 400):
+    def generate_text(self, prompt: str, k: int = 3, max_tokens: int = 1000): #max_tokens 1000으로 증가
         """
         주어진 prompt와 벡터 스토어를 활용해 텍스트를 생성한다.
         
