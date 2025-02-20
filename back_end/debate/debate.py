@@ -139,7 +139,7 @@ class Debate:
         elif step == 2:
             # 2. 찬성 측 주장
             result["speaker"] = "pos"
-            result["message"] = self.pos.answer(
+            result["message"] = self.pos.generate_text(
             f"""
             You are participating in a debate on the topic: **"{self.debate['topic']}"**. Your role is to argue in favor of this statement.  
 
@@ -172,7 +172,7 @@ class Debate:
         elif step == 3:
             # 3. 반대 측 주장
             result["speaker"] = "neg"
-            result["message"] = self.neg.answer(
+            result["message"] = self.neg.generate_text(
             f"""
             You are participating in a debate on the topic: **"{self.debate['topic']}"**. Your role is to argue against this statement.  
 
@@ -212,7 +212,7 @@ class Debate:
         elif step == 5:
             # 5. 반대 측 변론
             result["speaker"] = "neg"
-            result["message"] = self.neg.answer(
+            result["message"] = self.neg.generate_text(
             f"""
             You are participating in a debate on the topic: **"{self.debate['topic']}"**. Your role is to **counter** the arguments made by the opposing (affirmative) side.  
 
@@ -254,7 +254,7 @@ class Debate:
         elif step == 6:
             # 6. 찬성 측 변론
             result["speaker"] = "pos"
-            result["message"] = self.pos.answer(
+            result["message"] = self.pos.generate_text(
             f"""
             You are participating in a debate on the topic: **"{self.debate['topic']}"**. Your role is to **counter** the arguments made by the opposing (negative) side.  
 
@@ -302,7 +302,7 @@ class Debate:
         elif step == 8:
             # 8. 찬성 측 최종 결론
             result["speaker"] = "pos"
-            result["message"] = self.pos.answer(
+            result["message"] = self.pos.generate_text(
             f"""
             You are participating in a debate on the topic: **"{self.debate['topic']}"**. Your role is to **deliver the final statement in support of the affirmative position**.
 
@@ -343,7 +343,7 @@ class Debate:
         elif step == 9:
             # 9. 반대 측 최종 결론
             result["speaker"] = "neg"
-            result["message"] = self.neg.answer(
+            result["message"] = self.neg.generate_text(
             f"""
             You are participating in a debate on the topic: **"{self.debate['topic']}"**. Your role is to **deliver the final statement in support of the negative position**.
 
